@@ -1,4 +1,5 @@
-Page({
+Page({ 
+    
     data: { 
         //流程阶段
         submitAction:"",//发起,审批
