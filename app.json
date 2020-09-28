@@ -25,14 +25,14 @@
     "items": [
       {
         "pagePath": "page/trialRecord/trialRecordList/trialRecordList",
-        "icon": "/resources/yemian-copy-copy.png",
-        "activeIcon": "/resources/yemian-copy-copy.png",
+        "icon": "/resources/liucheng.png",
+        "activeIcon": "/resources/liucheng.png",
         "name": "样品流程"
       },
       {
         "pagePath": "page/selectCustomer/selectCustomer",
-        "icon": "/resources/markedcalendarp.png",
-        "activeIcon": "/resources/markedcalendarp.png",
+        "icon": "/resources/biaoji.png",
+        "activeIcon": "/resources/biaoji.png",
         "name": "过程记录"
       }
     

@@ -1,6 +1,8 @@
 <view class="page" style="min-height:100vh;margin-bottom:100rpx">
   <view class="tabNav">
     <view a:for="{{navTab}}" data-idx="{{index}}"  class="{{currentTabIndex==index ? 'cur' : ''}}" style="width:25%" onTap="currentTab"><text>{{item}}</text></view>
+     <view  class="add" onTap="gotoSampleApply">+新</view> 
+
   </view>
   <view class="a-list" style="padding-top:80rpx">
     <view  class="a-list-items">
@@ -34,7 +36,7 @@
     <view class='remind' a:if="{{cursor==null}}">没有更多了</view>
     <view class='remind' a:else>上拉加载...</view>
 </view>
-<view class="fixed-button">
+<!-- <view class="fixed-button">
       <button type="primary" onTap="gotoSampleApply">新样品申请</button>
-     </view>
+     </view> -->
 </view>

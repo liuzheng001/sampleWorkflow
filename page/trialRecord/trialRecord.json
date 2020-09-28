@@ -1,5 +1,7 @@
 {
   "usingComponents":{
     "commonmodal":"/components/commonmodal/commonmodal"
-  }
+  },
+    "defaultTitle": "流程详情"
+
 }
