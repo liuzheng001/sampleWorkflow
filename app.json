@@ -1,0 +1,42 @@
+{
+  "pages": [
+    "page/trialRecord/trialRecordList/trialRecordList",
+    "page/trialRecord/trialRecord",
+    "page/index/index",
+    "page/selectCustomer/selectCustomer",
+    "page/addSampleRecord/addSampleRecord",
+
+    "page/editSampleRecord/editSampleRecord",
+    "page/addMachine/addMachine",
+    "page/editSampleRecord/sampleList/sampleList"
+  ],
+  "window": {
+    "defaultTitle": "长凯CRM",
+    "backgroundColor": "#545232",
+    "pullRefresh": false,
+    "allowsBounceVertical": true,
+    "enableWK": "YES",
+    "enableDSL": true
+  },
+  "tabBar": {
+    "textColor": "#dddddd",
+    "selectedColor": "#49a9ee",
+    "backgroundColor": "#ffffff",
+    "items": [
+      {
+        "pagePath": "page/trialRecord/trialRecordList/trialRecordList",
+        "icon": "/resources/yemian-copy-copy.png",
+        "activeIcon": "/resources/yemian-copy-copy.png",
+        "name": "样品流程"
+      },
+      {
+        "pagePath": "page/selectCustomer/selectCustomer",
+        "icon": "/resources/markedcalendarp.png",
+        "activeIcon": "/resources/markedcalendarp.png",
+        "name": "过程记录"
+      }
+    
+    ]
+  },
+  "debug": true
+}
