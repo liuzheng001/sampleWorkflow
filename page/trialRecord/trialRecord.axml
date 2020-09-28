@@ -9,7 +9,7 @@
     <view class="page-section">
       <view class="row">
         <view class="row-title"><text style="color:red">*</text>申请单位</view>
-        <view class="search-container" >
+        <view a:if= {{authority[approvalStage].customerName[0]===1 }} class="search-container" >
           <view class="search-outer">
             <input
                     name = "customName"
@@ -34,6 +34,7 @@
               <view >下拉结果</view>-->
           </scroll-view>
         </view>
+        <view  a:else class="row-extra" >{{customerName}}</view>
       </view>
     </view>
 
