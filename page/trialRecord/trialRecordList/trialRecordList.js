@@ -118,7 +118,7 @@ Page({
                 },
                 success: function (res) {
                     if (res.data.success === true) {
-                        const url = getApp().globalData.applicationServer + "customizeWorkflow.php"
+                        const url = getApp().globalData.domain + "/customizeWorkflow.php"
                         dd.httpRequest({
                             url: url,
                             method: 'get',
@@ -131,9 +131,10 @@ Page({
                             },
                             success: function (res) {
                                 if (res.data.success === true) {
-                                    const  target = `detailed[${row}].['consultFlag'][0]`;
+                                    //前端将查看标志更改
+                                    const  target = `listData[${row}].['consultFlag'][0]`;
                                     t.setData({
-                                            [target]:0,
+                                            [target]:1,
                                         }
                                     );
 
