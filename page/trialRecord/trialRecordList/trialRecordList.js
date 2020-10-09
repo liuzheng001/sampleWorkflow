@@ -47,7 +47,26 @@ Page({
         // this.data.sampleID = query.sampleID;
         getList(this.data.navTab[1],1,t)
 
+        //将tabbar写入storage方便下次进入该tab
+        dd.setStorage({
+            key: 'tabbarIndex',
+            data: {
+                tabbarIndex:1
+            },
+            success: function () {
+            }
+        });
+
     },
+    /*onShow(){
+          const t = this;
+        //还原,否则会被记忆,但this.setData的渲染数据不会被记忆
+        // this.data.allProject = [];
+        this.data.cursor = 1;
+        this.data.listData = [];
+        // this.data.sampleID = query.sampleID;
+        getList(this.data.navTab[1],1,t)
+    },*/
     /* onPullDownRefresh() { //下拉刷新
          console.log('onPullDownRefresh', new Date())
          const mythis = this;

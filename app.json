@@ -1,5 +1,6 @@
 {
   "pages": [
+    "page/index/index",
     "page/trialRecord/trialRecordList/trialRecordList",
     "page/trialRecord/trialRecord",
     "page/index/index",

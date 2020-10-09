@@ -137,6 +137,25 @@ App({
                       /* dd.switchTab({ //日历
                                 url: '/page/index'
                             })*/
+                        dd.getStorage({
+                            key: 'tabbarIndex',
+                            success: function (res) {
+                                //不存在samleRecord key时，res.data为null
+                                if (res.data == null || res.data.tabbarIndex === 1) {
+                                    dd.switchTab({
+                                        url: '/page/trialRecord/trialRecordList/trialRecordList'
+                                    })
+                                } else {
+                                    dd.switchTab({
+                                        url: '/page/selectCustomer/selectCustomer'
+                                    })
+
+                                }
+                            },
+                            fail: function () {
+
+                            },
+                        })
                     },
                     fail: (res) => {
                         console.log("httpRequestFail---", res)

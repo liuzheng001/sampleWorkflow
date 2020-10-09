@@ -78,6 +78,15 @@ Page({
 
       })
 
+      dd.setStorage({
+          key: 'tabbarIndex',
+          data: {
+              tabbarIndex:2
+          },
+          success: function () {
+          }
+      });
+
       dd.getStorage({
           key: 'historySearch',
           success: function (res) {

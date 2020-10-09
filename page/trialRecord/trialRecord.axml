@@ -39,13 +39,13 @@
     </view>
 
     <view class="page-section">
-      <view class="input-title"><text style="color:red">*</text>现场描述</view>
+      <view class="input-title"><text style="color:red">*</text>现场描述<text style="font-size:0.2rem;color:gray">(产品要求、竞争对手、用量、价格等）</text></view>
       <textarea class="multilineInput" name="description" value={{description }}    disabled = {{authority[approvalStage].description[0]===1 && mode==="待处理"?false:true}}
  />
     </view>
 
     <view class="page-section">
-      <view class="input-title" style="padding-bottom:30rpx">媒体容器</view>
+      <view class="input-title" style="padding-bottom:30rpx">媒体容器<text style="font-size:0.2rem;color:gray">(产品、生产现场、设备等）</text></view>
       <view class="img-content">
         <block a:for="{{thumbs}}" >
           <view class="img-thumb"  >
@@ -81,7 +81,7 @@
       <picker onChange="costSelect" value="{{costIndex}}" range="{{costList}}"  disabled = {{authority[approvalStage].costIndex[0]===1&& mode==="待处理"?false:true}} >
         <view class="row">
           <view class="row-title"><text style="color:red">*</text>是否收费</view>
-          <view class="row-extra" ><input name="costIndex" value="{{costList[costIndex]}}" disabled = {{authority[approvalStage].costIndex[0]===1&& mode==="待处理"?false:true}}  /></view>
+          <view class="row-extra" ><input name="costIndex" value="{{costList[costIndex]}}" disabled = "true"  /></view>
           <view class="a-list-arrow a-list-arrow-horizontal" />
         </view>
       </picker>

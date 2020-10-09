@@ -105,33 +105,45 @@ Page({
                 // dd.alert({'content':"custom:"+JSON.stringify(res.data.content.data)})
 
                 //得到progressId对应的设备清单
-                const url = getApp().globalData.domain + "/fmSampleRec.php";
-                dd.httpRequest({
-                    url: url,
-                    method: 'get',
-                    data: {
-                        action: 'getProgressLines',
-                        // $_REQUEST['sampleID'].'|'.$_REQUEST['testCategory'].'|'.$_REQUEST['machineID'].'|'.$_REQUEST['formulaID']
-                        // sampleID:'6DFC100A-56D9-43FD-BD0A-BAE9F2388213',
-                        customerId:query.customerId,
-                    },
-                    dataType: 'json',
-                    success: (values) => {
-                        if (values.data.success === true) {
-                            //进入填写记录阶段
-                            //将新建的记录数据内容
-                            t.setData({
-                                projects: res.data.projects,
-                                ProgressLine:values.data.data.progressLines,
-                                customerId:query.customerId,
-                                thumbs:[]//navigateTo再次page该页面时,有数据不知什么原因,手动清一下
-                            });
+                if (res.data.success == true ) {
+                    if (res.data.projects.length > 0) {
+                        const url = getApp().globalData.domain + "/fmSampleRec.php";
+                        dd.httpRequest({
+                            url: url,
+                            method: 'get',
+                            data: {
+                                action: 'getProgressLines',
+                                // $_REQUEST['sampleID'].'|'.$_REQUEST['testCategory'].'|'.$_REQUEST['machineID'].'|'.$_REQUEST['formulaID']
+                                // sampleID:'6DFC100A-56D9-43FD-BD0A-BAE9F2388213',
+                                customerId: query.customerId,
+                            },
+                            dataType: 'json',
+                            success: (values) => {
+                                if (values.data.success === true) {
+                                    //进入填写记录阶段
+                                    //将新建的记录数据内容
+                                    t.setData({
+                                        projects: res.data.projects,
+                                        ProgressLine: values.data.data.progressLines,
+                                        customerId: query.customerId,
+                                        thumbs: []//navigateTo再次page该页面时,有数据不知什么原因,手动清一下
+                                    });
+                                }
+                            },
+                            fail: (res) => {
+                                dd.alert({'content': JSON.stringify(res)})
+                            }
+                        });
+                    } else {
+                        dd.alert({'content': "该客户尚未有试用记录，请与技术部联系。",
+                        success:   ()=> {dd.navigateBack();
                         }
-                    },
-                    fail: (res) => {
-                        dd.alert({'content': JSON.stringify(res)})
+                        })
+
                     }
-                })
+                }else{
+                    dd.alert({'content': JSON.stringify(res)})
+                }
             },
             fail: (res) => {
                 dd.alert({'content': JSON.stringify(res)})

@@ -42,7 +42,7 @@ Page({
         getFashion:[
             '技术部领取','生产部领取'
         ],
-        category: ['清洗剂', '切削液', '防锈油', '普油', '切削油'],
+        category: ['清洗类', '切削类', '防锈油', '普油', '切削油'],
         categoryIndex:-1,
 
         // thumbs:['http://47.103.63.213/eapp-corp/upload/1557635457409-2019-05-12.jpg',
@@ -679,13 +679,21 @@ Page({
 
     },
     catchDelete(e){  //不冒冒泡删除
-        const row = e.currentTarget.dataset.index;
-        let list = this.data.detailed;
-        list.splice(row,1);
-        this.setData({
-            "detailed":list
+        dd.confirm({
+            title: '提示',
+            content: '是否删除?',
+            confirmButtonText: '删除',
+            success: (result) => {
+                if(result.confirm === true){
+                const row = e.currentTarget.dataset.index;
+                let list = this.data.detailed;
+                list.splice(row, 1);
+                this.setData({
+                    "detailed": list
+                })
+                }
+            }
         })
-
     },
     onAdd() {
         let today = new Date();
@@ -780,23 +788,36 @@ Page({
             return item.name === form.customName;
         }
 
+        //数据校验
         let customID;
         if (this.data.submitAction === "发起") {
             const index = this.data.customList.findIndex(findFn);
             if(index==-1){
-                dd.alert({content: "客户名称,请检查!"});
+                dd.alert({content: "客户名称有误,请检查!"});
                 return;   }
             else {  //通过index找到客户ID
                 customID = this.data.customList[index].id;
             }
         }
 
+        if (form.description === "" || form.description.length < 50) {
+            dd.alert({content: "现场描述字数不能小于50个字符！"});
+            return;
+        }
+        if (t.data.thumbs.length <3 ) {
+            dd.alert({content: "媒体数不能小于3"});
+            return;
+        }
 
-        /*//数据校验
-        if (this.data.customIndex<0 || form.description=="" || form.demandNumber=="" || this.data.costIndex<0 || this.data.categoryIndex<0) {
+        if (form.demandNumber==="" || this.data.costIndex<0 || this.data.categoryIndex<0) {
             dd.alert({content: "提交数据有误,请检查!"});
             return;
-        }*/
+        }
+
+        if (this.data.approvalStage !== "apply" && this.data.detailed.length === 0) {
+            dd.alert({content: "至少必须选择一个试用产品,请检查!"});
+            return;
+        }
 
         dd.confirm({
             title: '提示',
@@ -859,8 +880,9 @@ Page({
                                                     dd.alert({
                                                         content: "审批已发起,id:" + recordId,
                                                         success: () => {
-                                                            dd.navigateBack(2);
-                                                            dd.redirectTo({url:"/page/trialRecord/trialRecordList/trialRecordList"})
+                                                            // dd.navigateBack();
+                                                            // dd.redirectTo({url:"/page/trialRecord/trialRecordList/trialRecordList"})
+                                                            dd.reLaunch({url:"/page/trialRecord/trialRecordList/trialRecordList"})
                                                         },
                                                     });
                                                 },
@@ -935,8 +957,10 @@ Page({
                                                     dd.alert({
                                                         content: "审批已提交,id:" + recordId,
                                                         success: () => {
-                                                            dd.navigateBack(2);
-                                                            dd.redirectTo({url:"/page/trialRecord/trialRecordList/trialRecordList"})
+                                                            // dd.navigateBack();
+                                                            // dd.redirectTo({url:"/page/trialRecord/trialRecordList/trialRecordList"})
+                                                            dd.reLaunch({url:"/page/trialRecord/trialRecordList/trialRecordList"})
+
                                                         },
                                                     });
                                                 },

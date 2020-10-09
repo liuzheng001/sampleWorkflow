@@ -1,13 +1,4 @@
-<!--<template  name = "templateTest">
-        <view >first {{first}} sec {{second}}</view>
-</template>-->
-<swiper
-		circular = "true"
-		current = "{{pathIndex}}"
->
-	<block a:for="{{picturePaths}}">
-		<swiper-item>
-			<view class='whole' style="background-image: url({{item}})" >
+	<view class='whole' style="background-image:url(/resources/note.jpg)" >
 				<view class="goldText">
 					 <!-- <text >心若不弃, 必然扬眉吐气</text> -->
 				</view>
@@ -22,14 +13,7 @@
 					</view>
 				</view>
 
-			</view>
-		</swiper-item>
-	</block>
-</swiper>
+	</view>
 
-<!--<block a:for="{{background}}">
-	<swiper-item>
-		<view class="swiper-item bc_{{item}}"></view>
-	</swiper-item>
-</block>-->
+
 
