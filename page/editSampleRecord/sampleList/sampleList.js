@@ -33,8 +33,11 @@ Page({
         
         //当前列表row号
         row:0,
-
         customerId:"",
+
+        //list向右滑动按钮
+        swiptRightButton:[{ type: 'delete', text: '删除', fColor: 'black' }],
+        swipeIndex:-1,
 
     },
     onLoad(query) {
@@ -57,6 +60,40 @@ Page({
          dd.stopPullDownRefresh()
 
      },*/
+    /**
+     * 列表项向左滑动操作
+     * @param e
+     */
+    onRightItemClick(e) {
+        const { type } = e.detail;
+        my.confirm({
+            title: '温馨提示',
+            content: `${e.index}-${e.extra}-${JSON.stringify(e.detail)}`,
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            success: (result) => {
+                const { list } = this.data;
+                if (result.confirm) {
+                    if (type === 'delete') {
+                        list.splice(this.data.swipeIndex, 1);
+                    }
+                    my.showToast({
+                        content: '确定 => 执行滑动删除还原',
+                    });
+                    e.done();
+                } else {
+                    my.showToast({
+                        content: '取消 => 滑动删除状态保持不变',
+                    });
+                }
+            },
+        });
+    },
+    onSwipeStart(e) {
+        this.setData({
+            swipeIndex: e.index,
+        });
+    },
     /**
      * 页面上拉触底事件的处理函数，与点击加载更多做同样的操作
      */

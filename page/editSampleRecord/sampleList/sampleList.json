@@ -1,3 +1,6 @@
 {
-  "defaultTitle": "数据列表"
+  "defaultTitle": "数据列表",
+  "usingComponents": {
+    "swipe-action": "mini-ali-ui/es/swipe-action/index"
+  }
 }

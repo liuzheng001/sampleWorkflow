@@ -8,7 +8,6 @@
     <view  class="a-list-items">
       <block a:for={{listData}} >
       <view class="a-list-item {{index==row?'active':''}}" hover-class="hover-list" onTap="onRecDetail" data-instanceId={{item['instanceId']}} data-recordId={{item['recordId']}} data-workflowStage={{item['workflowStage']}} data-row={{index}} >
-
       <view class="line" style="width:95%" >
           <icon a:if={{item['consultFlag'][0]==0}} type="success" size="20" color="red"/>
         <text class="content" >{{item['customerName']}}</text>
@@ -19,8 +18,6 @@
           <text class="content"  >审核阶段:{{item['workflowStage']}}</text>
           <text class="extra"  >{{item['start']}} </text>
       </view>
-        
-
         <!-- <view  class="a-list-item-extra" >
            <text class="checkbox-text">{{item['workflowStage']}}</text>
          </view>-->
@@ -30,8 +27,8 @@
         </view>-->
         <!-- <text class="a-list-item-address-content">{{item['machine']}}</text> -->
       </view>
+    </block>
     </view>
-  </block>
 </view>
     <view class='remind' a:if="{{cursor==null}}">没有更多了</view>
     <view class='remind' a:else>上拉加载...</view>

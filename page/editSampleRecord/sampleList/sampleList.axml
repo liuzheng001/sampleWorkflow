@@ -2,6 +2,15 @@
   <view class="a-list">
     <view  class="a-list-items">
       <block a:for={{listData}} >
+       <swipe-action
+				index="{{index}}"
+				restore="{{swipeIndex === null || swipeIndex !== index}}"
+				right="{{swiptRightButton}}"
+				onRightItemClick="onRightItemClick"
+				onSwipeStart="onSwipeStart"
+        extra="item{{index}}"
+				borderRadius="{{index <= 2 ? true : false}}"
+			>
       <view class="a-list-item {{index==row?'active':''}}" hover-class="hover-list" onTap="onSampleRecDetail" data-id={{item['sampleDataRecID']}} data-row={{index}} >
       <view class="a-list-item-line" style="width:95%">
         <text class="a-list-item-content" style="word-wrap: break-word;word-break: keep-all">{{item['product']}}</text>
@@ -18,9 +27,9 @@
         </view>
         <!-- <text class="a-list-item-address-content">{{item['machine']}}</text> -->
       </view>
-  </view>
-</block>
-
+    </view>
+    </swipe-action>
+    </block>
 </view>
 <view class='remind' a:if="{{cursor==null}}">没有更多了</view>
 <view class='remind' a:else>上拉加载...</view>
