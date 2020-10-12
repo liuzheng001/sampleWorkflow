@@ -38,6 +38,7 @@ Page({
         //list向右滑动按钮
         swiptRightButton:[{ type: 'delete', text: '删除', fColor: 'black' }],
         swipeIndex:-1,
+        deleteAuthority:false
 
     },
     onLoad(query) {
@@ -48,7 +49,11 @@ Page({
 
         // this.data.sampleID = query.sampleID;
         this.data.customerId = query.customerId;
-        getList(this.data.customerId,this.data.cursor,t)
+        //临时,今后通过角色权限来做
+        if (getApp().globalData.username === "刘正" || getApp().globalData.username === "舒印" || getApp().globalData.username === "刘帅") {
+            this.data.deleteAuthority = true;
+        }
+        getList(this.data.customerId,this.data.cursor,t);
 
     },
     /* onPullDownRefresh() { //下拉刷新
@@ -65,26 +70,42 @@ Page({
      * @param e
      */
     onRightItemClick(e) {
-        const { type } = e.detail;
-        my.confirm({
-            title: '温馨提示',
-            content: `${e.index}-${e.extra}-${JSON.stringify(e.detail)}`,
+        // const { type } = e.detail;
+        const t = this;
+        dd.confirm({
+            title: '提示',
+            content: '确认删除该记录?请将上传的media进入详情先删除.',
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             success: (result) => {
-                const { list } = this.data;
                 if (result.confirm) {
-                    if (type === 'delete') {
-                        list.splice(this.data.swipeIndex, 1);
-                    }
-                    my.showToast({
-                        content: '确定 => 执行滑动删除还原',
-                    });
-                    e.done();
-                } else {
-                    my.showToast({
-                        content: '取消 => 滑动删除状态保持不变',
-                    });
+                    const url = getApp().globalData.domain+'/fmSampleRec.php';
+                    // const url = "http://r1w8478651.imwork.net:9998/eapp-corp/fmSampleRec.php?action=deleteSampleRecord"
+                    dd.httpRequest({
+                        url: url,
+                        method: 'post',
+                        dataType: 'json',
+                        data: {
+                            action: "deleteSampleRecord",
+                            sampleDataRecID: e.extra,
+
+                        },
+                        success: function (res) {
+                            if (res.data.success) {
+                                let listData = t.data.listData;
+                                listData.splice(t.data.swipeIndex, 1);
+                                t.setData({
+                                        listData
+                                    }
+                                );
+                                e.done();//好像真机不执行
+                            } else {
+                                dd.alert({
+                                    content: "删除记录数据失败" + JSON.stringify(res)
+                                });
+                            }
+                        }
+                    })
                 }
             },
         });
