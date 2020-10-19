@@ -1,13 +1,15 @@
 <view>
- <commonmodal show="{{showModal}}"  onCancelRecord="onCancelRecord" onCreateRecord ="onCreateRecord" >
+
+    <commonmodal show="{{showModal}}"  onCancelRecord="onCancelRecord" onCreateRecord ="onCreateRecord" >
     <view a:if={{!addPline}} class="page-section">
-      <picker onChange="PLinesPickerChange" value="{{PLinesIndex}}" range="{{PLines}}" range-key="progressLineName">
+
+    <picker onChange="PLinesPickerChange" value="{{PLinesIndex}}" range="{{PLines}}" range-key="progressLineName">
           <view class="row">
             <view class="row-title">生产线名</view>
             <view class="row-extra"><input name="PLines" disabled="true" value={{PLinesIndex===-1?"请选择":PLines[PLinesIndex].progressLineName}}   /></view>
             <view class="a-list-arrow a-list-arrow-horizontal" />
           </view>
-        </picker>    
+        </picker>
     </view>
 
     <view class="page-section">
@@ -31,13 +33,10 @@
     </commonmodal>
   <form onSubmit="formSubmit">
   <view class="page-section">
-    <picker onChange="PLinesChange" value="{{PLinesIndex}}" range="{{PLines}}" range-key="PLineName">
       <view class="row">
-        <view class="row-title">生产线</view>
-        <view class="row-extra"><input name="PLines" disabled="true" value={{PLinesIndex===-1?"请选择":PLines[PLinesIndex].PLineName}}   /></view>
-        <view class="a-list-arrow a-list-arrow-horizontal" />
+          <view class="row-title">生产线名</view>
+          <view class="row-extra"><input name="PLineName" style="font-size:32rpx" value="{{PLineName}}"  disabled="true" /></view>
       </view>
-    </picker>
   </view>
   <view class="page-section">
     <view class="row">
@@ -97,8 +96,9 @@
 	</view>
  </view>
   <!--<view class="fixed-button">-->
-    <button class='cancel-btn' style='color:rgba(7,17,27,0.6)' onTap='cancel'>取消</button>
-    <button class='confirm-btn' style='color:#13b5f5' formType="submit">确定</button>
+
+  <button class='cancel-btn' style='color:rgba(7,17,27,0.6)' onTap='cancel'>取消</button>
+  <button class='confirm-btn' style='color:#13b5f5' formType="submit">确定</button>
   <!--</view>-->
 </form>
 </view>

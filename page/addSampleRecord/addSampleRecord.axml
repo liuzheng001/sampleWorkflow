@@ -96,6 +96,9 @@
                </picker>
            </view>
     </commonmodal> -->
+
+    <!--<input name="selectProgressLine"  value="{{ProgressLine[ProgressLine.length-1]}}" disabled="true"  />-->
+    
     <view class="page-section">
         <picker onChange="selectPLine" value="{{ProgressLineIndex}}" range="{{ProgressLine}}" range-key="PLineName">
             <view class="row">

@@ -28,8 +28,7 @@ Component({
 
     //modal的高度
     // height: '100%',
-    onCancelRecord:(data)=>{ 
-      
+    onCancelRecord:(data)=>{
          console.log(data);
     },
     onCreateRecord:(data)=>{

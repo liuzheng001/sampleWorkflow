@@ -1,6 +1,7 @@
 {
   "pages": [
     "page/index/index",
+    "page/addMachine/addMachine",
     "page/trialRecord/trialRecordList/trialRecordList",
     "page/trialRecord/trialRecord",
     "page/index/index",
@@ -8,7 +9,6 @@
     "page/addSampleRecord/addSampleRecord",
 
     "page/editSampleRecord/editSampleRecord",
-    "page/addMachine/addMachine",
     "page/editSampleRecord/sampleList/sampleList"
   ],
   "window": {

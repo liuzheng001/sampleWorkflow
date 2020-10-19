@@ -133,6 +133,10 @@ App({
                         app.globalData.userId = userId;
                         app.globalData.username = userName;
                         app.globalData.departments = res.data.result.departments;
+                        //调试
+                       /* app.globalData.userId = "096808514727420087";
+                        app.globalData.username = "殷漮键";
+                        app.globalData.departments = [69525103];*/
                         // 调试时关闭getworkflow
                       /* dd.switchTab({ //日历
                                 url: '/page/index'

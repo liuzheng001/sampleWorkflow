@@ -154,7 +154,7 @@ Page({
         })
     },
     onShow(){
-        const t = this;
+        /*const t = this;
 
         //读取fm选择样品记录列表
         const url = getApp().globalData.domain + "/fmSampleRec.php";
@@ -171,10 +171,10 @@ Page({
                         //进入填写记录阶段
                         //将新建的记录数据内容
                         const ProgressLine = res.data.data.progressLines;
-                        const selectMachine = ProgressLine[t.data.ProgressLineIndex].machines
+                        // const selectMachine = ProgressLine[t.data.ProgressLineIndex].machines
                         t.setData({
                             ProgressLine:ProgressLine,
-                            selectMachine:selectMachine,
+                            // selectMachine:selectMachine,
                         });
 
                     }
@@ -182,48 +182,10 @@ Page({
                 fail: (res) => {
                     dd.alert({'content': JSON.stringify(res)})
                 }
-        })
+        })*/
     },
     onUnload() {
-        /*console.log("返回键按下,page销毁")
-        //真机上可调试,ide直接忽略
-        // dd.alert({content:JSON.stringify(this.data.subjects)})
-        if (this.data.backMode === 1) { //提交退出
-            dd.removeStorage({
-                key: 'sampleRecord',
-            });
-        }else { //返回键退出
-            //将数据写入storage
-            dd.setStorage({
-                key: 'sampleRecord',
-                data: {
-                    sampleID: this.data.sampleID,//试用记录ID
-                    testCategory: this.data.testCategory,
-                    testCategoryIndex: this.data.testCategoryIndex, //检测类型序号
-                    //选择产品
-                    selectProduct: this.data.selectProduct,
-                    selectProductIndex: this.data.selectProductIndex,
-                    //选择设备
-                    selectMachine: this.data.selectMachine,
-                    selectMachineIndex: this.data.selectMachineIndex,
-                    //试样类别
-                    category: this.data.category,
-                    //检测项目
-                    subjects: this.data.subjects,
-                    addSubjects: this.data.addSubjects,
 
-                    //媒体信息,url保证视频文件唯一性,最好加上fm中的主键ID,比如样品记录数据ID
-                    thumbs: this.data.thumbs,
-                    remark:this.data.remark,
-
-                    stage: this.data.stage,//0是在选择机器和产品阶段,1为记录阶段
-
-                },
-                success: function () {
-                    // dd.alert({content: '写入成功'});
-                }
-            });
-        }*/
     },
     openModal() {
         this.setData({
@@ -339,13 +301,14 @@ Page({
 
         } else {
             //导航到新增设备page,带参数progressId
-            dd.navigateTo({url: '/page/addMachine/addMachine?customerId='+this.data.customerId+'&PLines='+JSON.stringify(this.data.ProgressLine)+'&PLinesIndex='+this.data.ProgressLineIndex});
+            // dd.navigateTo({url: '/page/addMachine/addMachine?customerId='+this.data.customerId+'&PLines='+JSON.stringify(this.data.ProgressLine)+'&PLinesIndex='+this.data.ProgressLineIndex});
+            dd.navigateTo({url: '/page/addMachine/addMachine?customerId='+this.data.customerId+'&PLineId='+this.data.ProgressLine[this.data.ProgressLineIndex].PLineId+'&PLineName='+this.data.ProgressLine[this.data.ProgressLineIndex].PLineName});
         }
     },
     //建立新生产线
     addProgressLine() {
         //导航到新增设备page,带参数progressId
-        dd.navigateTo({url: '/page/addMachine/addMachine?customerId='+this.data.customerId+'&showModal=true'+'&PLines='+JSON.stringify(this.data.ProgressLine)});
+        dd.navigateTo({url: '/page/addMachine/addMachine?customerId='+this.data.customerId+'&showModal=true'});
     },
     //mask组件触发page(外组件)方法
     onCancelRecord(isShow) {
