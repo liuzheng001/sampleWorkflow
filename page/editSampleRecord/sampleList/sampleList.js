@@ -95,7 +95,8 @@ Page({
                                 let listData = t.data.listData;
                                 listData.splice(t.data.swipeIndex, 1);
                                 t.setData({
-                                        listData
+                                        listData,
+                                        swipeIndex:-1
                                     }
                                 );
                                 e.done();//好像真机不执行

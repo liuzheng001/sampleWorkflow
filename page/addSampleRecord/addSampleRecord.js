@@ -89,7 +89,7 @@ Page({
     },
     onLoad(query) {
         const t = this;
-
+        dd.showLoading();
         //读取fm选择样品记录列表
         const url = getApp().globalData.domain + "/fmSampleRec.php";
         dd.httpRequest({
@@ -149,6 +149,7 @@ Page({
                 dd.alert({'content': JSON.stringify(res)})
             },
             complete: (res) => {
+                dd.hideLoading();
             }
 
         })

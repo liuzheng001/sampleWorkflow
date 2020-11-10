@@ -231,6 +231,7 @@ Page({
         }else {//无,则进入建立记录
             // this.data.submitAction = "发起";
             approvalStage = "apply";
+
         }
         let url;
         if(approvalStage ==="apply") {
@@ -862,7 +863,19 @@ Page({
                                     success: (res) => {
                                         if (res.data.success == true) {
                                             const recordId = res.data.instanceRecordId;
-                                            const url =getApp().globalData.applicationServer+"uploadMediasToAiliForComponents.php"
+                                            dd.alert({
+                                                content: "审批已发起,id:" + recordId,
+                                                success: () => {
+                                                    // dd.navigateBack();
+                                                    // dd.redirectTo({url:"/page/trialRecord/trialRecordList/trialRecordList"})
+                                                    dd.reLaunch({url:"/page/trialRecord/trialRecordList/trialRecordList"})
+                                                },
+                                            });
+                                            //先刷新页面,再提交图片
+                                            if (t.data.thumbs.length <= 0) {
+                                                return;
+                                            }
+                                            const url =getApp().globalData.applicationServer+"uploadMediasToAiliForComponents.php";
                                             dd.httpRequest({
                                                 url: url,
                                                 method: 'POST',
@@ -870,26 +883,38 @@ Page({
                                                     recordId,
                                                     recordSheetName: "样品试用记录",
                                                     thumbs: JSON.stringify(t.data.thumbs),
-
                                                     max: 6,
                                                     waitDeleteVideoIds: t.data.waitDeleteVideoIds.join(','),
                                                     waitDeleteImageIds: t.data.waitDeleteImageIds.join(',')
                                                 },
                                                 dataType: 'json',
                                                 success: (res1) => {
-                                                    dd.alert({
+                                                   /* dd.alert({
                                                         content: "审批已发起,id:" + recordId,
                                                         success: () => {
                                                             // dd.navigateBack();
                                                             // dd.redirectTo({url:"/page/trialRecord/trialRecordList/trialRecordList"})
                                                             dd.reLaunch({url:"/page/trialRecord/trialRecordList/trialRecordList"})
                                                         },
-                                                    });
+                                                    });*/
+                                                    if (res1.data.success == true) {
+                                                        dd.showToast({
+                                                            type: 'success',
+                                                            content: '媒体上传成功',
+                                                            duration: 300,
+                                                        });
+                                                    } else {
+                                                        dd.alert({
+                                                            content: "上传阿里云失败,请将该截屏发给管理员." + JSON.stringify(res1),
+                                                        })
+                                                    }
+
                                                 },
                                                 fail: (res1) => {
                                                     dd.alert({content: JSON.stringify(res1)});
                                                 },
                                                 complete: (res) => {
+                                                    // t.data.thumbs=[]
                                                     dd.hideLoading();
                                                 }
                                             })
@@ -902,7 +927,7 @@ Page({
                                         dd.alert({content: JSON.stringify(res)});
                                     },
                                     complete: (res) => {
-                                        dd.hideLoading();
+                                        // dd.hideLoading();
                                     }
                                 });
                             }else {  //修改流程
@@ -939,6 +964,19 @@ Page({
                                     success: (res) => {
                                         if (res.data.success == true) {
                                             const recordId = res.data.instanceRecordId;
+                                            dd.alert({
+                                                content: "审批已提交,id:" + recordId,
+                                                success: () => {
+                                                    // dd.navigateBack();
+                                                    // dd.redirectTo({url:"/page/trialRecord/trialRecordList/trialRecordList"})
+                                                    dd.reLaunch({url:"/page/trialRecord/trialRecordList/trialRecordList"})
+                                                },
+                                            });
+                                            //流程状态已更改,返回列表page
+                                            //thumbs无值,且也没有待删除的图片或视频,则返回
+                                            if (t.data.thumbs.length <= 0 && t.data.waitDeleteVideoIds==="" && t.data.waitDeleteImageIds) {
+                                                return;
+                                            }
                                             const url =getApp().globalData.applicationServer+"uploadMediasToAiliForComponents.php"
                                             dd.httpRequest({
                                                 url: url,
@@ -947,28 +985,30 @@ Page({
                                                     recordId,
                                                     recordSheetName: "样品试用记录",
                                                     thumbs: JSON.stringify(t.data.thumbs),
-
                                                     max: 6,
                                                     waitDeleteVideoIds: t.data.waitDeleteVideoIds.join(','),
                                                     waitDeleteImageIds: t.data.waitDeleteImageIds.join(',')
                                                 },
                                                 dataType: 'json',
                                                 success: (res1) => {
-                                                    dd.alert({
-                                                        content: "审批已提交,id:" + recordId,
-                                                        success: () => {
-                                                            // dd.navigateBack();
-                                                            // dd.redirectTo({url:"/page/trialRecord/trialRecordList/trialRecordList"})
-                                                            dd.reLaunch({url:"/page/trialRecord/trialRecordList/trialRecordList"})
-
-                                                        },
-                                                    });
+                                                    if (res1.data.success == true) {
+                                                        dd.showToast({
+                                                            type: 'success',
+                                                            content: '媒体上传成功',
+                                                            duration: 300,
+                                                        });
+                                                    } else {
+                                                        dd.alert({
+                                                            content: "上传阿里云失败,请将该截屏发给管理员." + JSON.stringify(res1),
+                                                        })
+                                                    }
                                                 },
                                                 fail: (res1) => {
                                                     dd.alert({content: JSON.stringify(res1)});
                                                 },
                                                 complete: (res) => {
                                                     dd.hideLoading();
+                                                    // t.data.thumbs=[]; t.data.waitDeleteVideoIds=[];t.data.waitDeleteImageIds=[]
                                                 }
                                             })
                                         } else {
@@ -980,7 +1020,7 @@ Page({
                                         dd.alert({content: JSON.stringify(res)});
                                     },
                                     complete: (res) => {
-                                        dd.hideLoading();
+                                        // dd.hideLoading();
                                     }
                                 });
                             }
