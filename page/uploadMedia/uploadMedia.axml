@@ -1,0 +1,41 @@
+<view a:if={{showVideo}} class="videoContainer">
+<!--<video class="video"  src="{{videoUrl}}" autoplay="true"   />-->
+<video
+id="v"
+class="source-video-content"
+src="{{videoUrl}}"
+onTimeUpdate="onTimeUpdate"
+objectFit="contain"
+style="width: 200px; height: 200px"
+enableNative="{{true}}"
+>
+</video>
+
+<button class="videoButton" onTap="onCloseVideo">关闭</button>
+<button class="videoButton" onTap="onUploadMedia">上传</button>
+</view>
+<view>
+  <view class="page-section">
+    <view class="input-title" style="padding-bottom:30rpx">选择图片或视频</view>
+    <view class="img-content">
+      <block a:for="{{thumbs}}" >
+        <view class="img-thumb"  >
+          <!--<image  style = "width:120rpx;height:120rpx" src="{{item}}" onTap="onMediaPreview" data-src="{{item}}" mode="scaleToFill" />-->
+          <image style=" width: 240rpx;height: 240rpx;" src="{{item.category==='image'?item.url:'/resources/video.jpeg'}}" onTap="onMediaPreview" data-src="{{item.url}}" data-category= "{{item.category}}" data-index={{index}} mode="scaleToFill" />
+          <view class="imgdelete">
+            <text  onTap="onDeleteMedia"  data-index="{{index}}" class="iconfont icon-delete"/>
+          </view>
+        </view>
+      </block>
+      <view a:if={{thumbs.length<9}} class="img-thumb"  >
+           <text  style ="font-size:240rpx;color:brown"   onTap="onAddMedia" class="iconfont icon-add-fill"/>
+      </view>
+  </view>
+  </view>
+   <view  class="fixed-button">
+        <button  onTap="updateMediaToFm" >上传媒体</button>
+        <button class="videoButton" onTap="onUploadMedia">上传测试</button>
+
+   </view>
+
+ </view>

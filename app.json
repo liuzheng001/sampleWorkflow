@@ -1,5 +1,6 @@
 {
   "pages": [
+    "page/uploadMedia/uploadMedia",
     "page/index/index",
     "page/addMachine/addMachine",
     "page/trialRecord/trialRecordList/trialRecordList",
@@ -7,7 +8,6 @@
     "page/index/index",
     "page/selectCustomer/selectCustomer",
     "page/addSampleRecord/addSampleRecord",
-
     "page/editSampleRecord/editSampleRecord",
     "page/editSampleRecord/sampleList/sampleList"
   ],
@@ -36,7 +36,6 @@
         "activeIcon": "/resources/biaoji.png",
         "name": "过程记录"
       }
-    
     ]
   },
   "debug": true
