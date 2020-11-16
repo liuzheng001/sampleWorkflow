@@ -1,41 +1,85 @@
 <view a:if={{showVideo}} class="videoContainer">
 <!--<video class="video"  src="{{videoUrl}}" autoplay="true"   />-->
-<video
-id="v"
-class="source-video-content"
-src="{{videoUrl}}"
-onTimeUpdate="onTimeUpdate"
-objectFit="contain"
-style="width: 200px; height: 200px"
-enableNative="{{true}}"
->
-</video>
-
-<button class="videoButton" onTap="onCloseVideo">关闭</button>
-<button class="videoButton" onTap="onUploadMedia">上传</button>
+    <video
+        id="v"
+        class="video"
+        src="{{videoUrl}}"
+        onTimeUpdate="onTimeUpdate"
+        objectFit="contain"
+        autoplay="true"
+        enableNative="true"
+    />
+    <button class="videoButton" onTap="onCloseVideo">关闭</button>
 </view>
 <view>
   <view class="page-section">
-    <view class="input-title" style="padding-bottom:30rpx">选择图片或视频</view>
-    <view class="img-content">
-      <block a:for="{{thumbs}}" >
-        <view class="img-thumb"  >
-          <!--<image  style = "width:120rpx;height:120rpx" src="{{item}}" onTap="onMediaPreview" data-src="{{item}}" mode="scaleToFill" />-->
-          <image style=" width: 240rpx;height: 240rpx;" src="{{item.category==='image'?item.url:'/resources/video.jpeg'}}" onTap="onMediaPreview" data-src="{{item.url}}" data-category= "{{item.category}}" data-index={{index}} mode="scaleToFill" />
-          <view class="imgdelete">
-            <text  onTap="onDeleteMedia"  data-index="{{index}}" class="iconfont icon-delete"/>
+      <view class="row" style="border-bottom: 1px solid #ddd">
+          <view class="row-title">
+            <view class="line">项目:{{projectName}}</view>
+            <view class="line">试验记录:{{testRecordName}}</view>
           </view>
+          <view class="row-extra" style="flex:1 1 0%">
+             <text  style ="font-size:240rpx;color:orange"   onTap="onAddMedia" class="iconfont icon-add-fill"/>
         </view>
-      </block>
-      <view a:if={{thumbs.length<9}} class="img-thumb"  >
-           <text  style ="font-size:240rpx;color:brown"   onTap="onAddMedia" class="iconfont icon-add-fill"/>
       </view>
   </view>
+
+  <view> <!--media列表-->
+  <block a:for="{{thumbs}}" >
+      <view class="row" style="border-bottom: 1px solid #ddd">
+
+      <view class="row-title">
+          <view class="img-thumb"  >
+              <image  style = "width:240rpx;height:240rpx" src="{{item.category==='image'?item.nativeUrl:'/resources/video.jpeg'}}" onTap="onMediaPreview" data-src="{{item.nativeUrl}}" data-category= "{{item.category}}" mode="scaleToFill" />
+          </view>
+      </view>
+      <view class="row-extra" style="flex:1 1 0%;text-align:left">
+          <view class="line"><text>名称:{{item['name']}}</text></view>
+          <view class="line"><text>尺寸:{{item['size']}}</text></view>
+          <view><button size="mini" type="warn">删除</button></view>
+      </view>
+      </view>
+  </block>
   </view>
-   <view  class="fixed-button">
+   <!-- <view  class="fixed-button">
         <button  onTap="updateMediaToFm" >上传媒体</button>
         <button class="videoButton" onTap="onUploadMedia">上传测试</button>
-
-   </view>
-
+   </view> -->
  </view>
+
+<view>
+    <!--模态框，选择配方号-->
+    <commonmodal show="{{showModal}}"
+                 onCancelRecord="onCancel"
+                 onCreateRecord ="onUploadMediaToFmContainer"
+                 parameter = "{{index}}"
+    >
+        <view class="page-section">
+                <view class="row">
+                    <view class="row-title">媒体类型</view>
+                    <view class="row-extra"><input name="mediaType"  value={{mediaType}} disabled="true"  /></view>
+                    <view class="a-list-arrow a-list-arrow-horizontal" />
+                </view>
+        </view>
+        <view class="page-section">
+            <view class="row">
+                <view class="row-title">文件名</view>
+                <view class="row-extra"><input name="mediaName"  value={{fileName}} disabled="true" /></view>
+                <view class="a-list-arrow a-list-arrow-horizontal" />
+            </view>
+        </view>
+        <view class="page-section">
+            <view class="row">
+                <view class="row-title">媒体信息</view>
+                <view class="row-extra"><input   value={{mediaMessage}} onInput="onMediaMessage" /></view>
+                <view class="a-list-arrow a-list-arrow-horizontal" />
+            </view>
+        </view>
+
+        <view class="page-section">
+            <view class="input-title">备注</view>
+            <textarea class="multilineInput"  value={{mediaRemark}} onInput="onMediaRemark"/>
+        </view>
+
+    </commonmodal>
+</view>
