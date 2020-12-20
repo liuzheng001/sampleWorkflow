@@ -14,7 +14,14 @@ page {
 .page-description {
   margin-bottom: 32rpx;
 }
-
+/* 页面中的分类名称 */
+.page-module-title{
+  font-size: 36rpx;
+  text-align: center;
+  padding:10px 0px;
+  margin:10px 0px;
+  background-color: dodgerblue;
+}
 .page-section {
   background: #fff;
   margin-bottom: 32rpx;

@@ -3,8 +3,8 @@ Page({
         showVideo: false,
         projectName:"",//项目名称
         // recordId:-1,//试验记录ID
-        recordId:"77ADD3B4-AF7C-794D-950F-C076F2A0D4DA",
-        testRecordName:"",//试验记录名称
+        recordId:-1,
+        recordNum:"",//试验记录编号
 
 
         //媒体列表,url保证视频文件唯一性,最好加上fm中的主键ID,比如样品记录数据ID
@@ -39,12 +39,67 @@ Page({
 
         showModal:false,
         mediaRemark:"",
-        fileName:"",
+        mediaMessage:"",
         mediaType:"",
+        fileName:"",
+        mediaSize:"",
     },
     onLoad(query) {
         //得到项目名称和试验记录Id
     },
+    //扫描fm二维码,得到试验记录Id等信息
+    qrScan(){
+        const t =this;
+        if (t.data.thumbs.length>0) {
+            dd.confirm({
+                title: '更换试验记录',
+                content: '确定更换试验记录?',
+                confirmButtonText: '确认',
+                success: (result) => {
+                    if (result.confirm === true) {
+                        dd.scan({
+                            type: 'qr',
+                            success: (res) => {
+                                if (res.code.indexOf("recordId") === -1) {
+                                    dd.alert({content: "错误:请打开试验记录-试验记录详情布局扫描二维码"})
+                                }
+                                else {
+                                    const data = JSON.parse(res.code);
+                                    t.setData({
+                                        recordId: data.recordId,
+                                        recordNum: data.recordNum,
+                                        projectName: data.projectName,
+                                        thumbs: [],
+                                    });
+                                }
+                            },
+
+                        })
+                    }
+                }
+            })
+        }else {
+            dd.scan({
+                type: 'qr',
+                success: (res) => {
+                    if (res.code.indexOf("recordId") === -1) {
+                        dd.alert({content: "错误:请打开试验记录-试验记录详情布局扫描二维码"})
+                    }
+                    else{
+                            const data = JSON.parse(res.code);
+                            t.setData({
+                                recordId: data.recordId,
+                                recordNum: data.recordNum,
+                                projectName: data.projectName,
+                                thumbs: [],
+                            });
+                        }
+
+                },
+            })
+        }
+    },
+
     //媒体容器相关
     onMediaPreview(e) {
         const Url = e.currentTarget.dataset.src;
@@ -163,17 +218,21 @@ Page({
                                 dd.alert({content: "视频时长不能超过1分钟."})
                             } else {
                                 const path = res.filePath;
-                               /* // dd.showLoading();
-                                thumbs.push({nativeUrl: path, category: 'video'});
-                                //将数据存入,但没有上传
-                                this.setData({
-                                    thumbs: thumbs,
-                                })*/
+                               const mediaSize = res.size
+
+                                    /* // dd.showLoading();
+                                     thumbs.push({nativeUrl: path, category: 'video'});
+                                     //将数据存入,但没有上传
+                                     this.setData({
+                                         thumbs: thumbs,
+                                     })*/
                                 fileName = path;
                                 mediaType = '视频';
                                 this.setData({
                                     showModal:true,
-                                    mediaType,fileName
+                                    mediaType,
+                                    fileName,
+                                    mediaSize
                                 })
                             }
                         },
@@ -187,11 +246,6 @@ Page({
             },
         })
     },
-    onCancel() {
-        this.setData({
-            showModal:false,
-        })
-    },
     onMediaMessage (e) {
         this.data.mediaMessage = e.detail.value;
 
@@ -200,10 +254,20 @@ Page({
         this.data.mediaRemark = e.detail.value;
 
     },
+    onCancel() {
+        this.setData({
+            showModal:false,
+        })
+    },
     onUploadMediaToFmContainer(e) {//上传到fmContainer,成功后增加列表项
+        //校验
+        if (this.data.mediaMessage==="" ||  this.data.mediaRemark===""){
+            dd.alert({content: "数据不全"})
+            return;
+        }
         const t =this;
         const path = this.data.fileName;
-        const fileName = this.data.mediaMessage;
+        const mediaMessage = this.data.mediaMessage;
         const remark = this.data.mediaRemark;//后台未使用
         const recordId = this.data.recordId;
         const mediaType = this.data.mediaType === "图片" ? "image" : "video";
@@ -218,7 +282,9 @@ Page({
             filePath: path,
             formData: {testRecordId:recordId,
                        action:"uploadMedia",
-                     fileName},
+                      mediaMessage,
+                        remark
+            },
             success: res => {
                 const data = JSON.parse(res.data)
                 if (data.success=== true) {
@@ -226,12 +292,16 @@ Page({
                     // dd.hideLoading();
                     dd.alert({content: "上传成功"})
                     let thumbs = t.data.thumbs;
-                    thumbs.push({nativeUrl: path, category: mediaType});
+                    thumbs.push({nativeUrl: path, category: mediaType,size:t.data.mediaSize,remark:remark,name:mediaMessage});
                     //将数据存入,但没有上传
                     t.setData({
                         thumbs: thumbs,
+                        mediaRemark:"",
+                        mediaMessage:"",
+                        mediaType:"",
+                        fileName:"",
+                        mediaSize:"",
                     })
-
                 } else {
                     dd.alert({content: `上传服务器失败：${JSON.stringify(res)}`})
                 }
@@ -248,7 +318,7 @@ Page({
         });
 
     },
-    onDeleteMedia(e) {
+   /* onDeleteMedia(e) {
         const t = this;
         const index = e.currentTarget.dataset.index; //第几张图
         let thumbs = this.data.thumbs;
@@ -308,76 +378,12 @@ Page({
             }
         })
 
-    },
+    },*/
 
 
 
 })
 
-
-/*function updateMedia(thumb) {
-    console.log('thumb:'+JSON.stringify(thumb));
-    return new Promise(function (resolve,reject) {
-        const url =getApp().globalData.applicationServer+"uploadVideoToAili.php"
-        const fileType = thumb.category==="image"?"image":"video"
-        dd.uploadFile({
-            // url: getApp().globalData.domain + '/upload/upload.php',
-            url:url,
-            fileType: fileType,
-            fileName: 'file',
-            filePath: thumb.url,
-            formData:{fileType:fileType},
-            success: res => {
-                console.log(JSON.parse(res.data));
-                if (JSON.parse(res.data).result == "success") {
-                    //返回上传图片urls
-                    resolve(JSON.parse(res.data).fileUrl);
-                } else {
-                    dd.hideLoading();
-                    dd.alert({content: `上传服务器失败：${JSON.stringify(res)}`})
-                    reject('failure');
-                }
-            },
-            fail: function (res) {
-                dd.hideLoading();
-                dd.alert({content: `上传失败：${JSON.stringify(res)}`});
-                reject('failure');
-            },
-        });
-    })
-}*/
-
-function updateImageToServer(thumb) {
-    // console.log('thumb:'+JSON.stringify(thumb));
-    return new Promise(function (resolve,reject) {
-        const url =getApp().globalData.applicationServer+"uploadMediaToServer.php"
-        const fileType = thumb.category==="image"?"image":"video"
-        dd.uploadFile({
-            // url: getApp().globalData.domain + '/upload/upload.php',
-            url:url,
-            fileType: fileType,
-            fileName: 'file',
-            filePath: thumb.url,
-            formData:{fileType:fileType},
-            success: res => {
-                console.log(JSON.parse(res.data));
-                if (JSON.parse(res.data).result == "success") {
-                    //返回上传图片urls
-                    resolve(JSON.parse(res.data).fileUrl);
-                } else {
-                    dd.hideLoading();
-                    dd.alert({content: `上传服务器失败：${JSON.stringify(res)}`})
-                    reject('failure');
-                }
-            },
-            fail: function (res) {
-                dd.hideLoading();
-                dd.alert({content: `上传失败：${JSON.stringify(res)}`});
-                reject('failure');
-            },
-        });
-    })
-}
 
 function deleteImageToServer(thumb) {
     return new Promise(function (resolve,reject) {

@@ -1,5 +1,6 @@
 
 <view  style="position:relative">
+    <form onSubmit="onSubmit">
     <view class="page-section">
       <view class="row">
         <view class="row-title">类别/检测类别</view>
@@ -8,7 +9,7 @@
     </view>
     <view class="page-section">
       <view class="row">
-        <view class="row-title">生产线/设备名称</view>
+        <view class="row-title" data-plineid="{{pLineId}}" data-machineid="{{machineId}}" onTap="editPLineOrMachine">生产线/设备名称</view>
         <view class="row-extra"><view><input  style={{selectProgressLine.length>15?"font-size:24rpx":"font-size:32rpx"}} value={{selectProgressLine}} disabled="true"  /></view><view><input  style={{selectMachine.length>15?"font-size:24rpx":"font-size:32rpx"}} value={{selectMachine}} disabled="true"  /></view></view>
       </view>
     </view>
@@ -55,15 +56,53 @@
             </view>
         </view>
     </view>
-        <view a:if={{showVideo}} class="videoContainer">
-             <video class="video"  src="{{videoUrl}}" autoplay="true"   />
-             <button class="videoButton" onTap="onCloseVideo">关闭</button>
-        </view>
     <view class="page-section">
         <view class="input-title">备注</view> 
         <textarea class="multilineInput" data-name="remark" value={{remark}} onInput="onTextareaInput" />
     </view>
+<view a:if="{{!isException}}"><button type="warn" onTap="onException">记录异常</button></view>
 
-    <button type="primary" onTap="onSubmit" style="position:absolute;margin:0px;width:100%">提交</button>
+<block a:if="{{isException}}">
+    <!--<view class="exceptionCon" animation="{{animationInfo}}" style="opacity:0">-->
+    <view class="exceptionCon" animation="{{animationInfo}}" style="{{animationInfo?0:1}}">
+        <view class="page-module-title" style="background-color:orange">异常记录</view>
+        <view class="page-section">
+            <view class="row" style="border-bottom: 1px solid #ddd"  data-type="buildTime">
+                <view class="row-title">建立异常时间</view>
+                <view class="row-extra"><input name="exceptionBuildTime" value="{{exceptionBuildTime}}" disabled="true"  /></view>
+                <view class="a-list-arrow a-list-arrow-horizontal" />
+            </view>
+            <view class="input-title"><text style="color:red">*</text>异常描述</view>
+            <textarea class="multilineInput" style="border-bottom: 1px solid #ddd" focus="{{focus}}" name="exceptionDescription" value="{{exceptionDescription}}" />
+            <view class="input-title">异常处置办法</view>
+            <textarea class="multilineInput" style="border-bottom: 1px solid #ddd"  name="handlingMethod" value="{{handlingMethod}}" />
+        </view>
+
+        <view class="page-section">
+            <view class="input-title">处理结果</view>
+            <radio-group name="effectGroupIndex" style="display:flex;margin-top:40rpx;border-bottom: 1px solid #ddd" onChange="radioChange">
+                <label  style="flex:1;margin-left:0.1rem;font-size:0.34rem"><radio value="0" checked="{{effectGroupIndex==0}}"/>解决</label>
+                <label  style="flex:1;font-size:0.34rem"><radio value="1" checked="{{effectGroupIndex==1}}"/>部分解决</label>
+                <label  style="flex:1.5;font-size:0.34rem"><radio value="2" checked="{{effectGroupIndex==2}}"/>未解决</label>
+            </radio-group>
+        <block a:if="{{effectGroupIndex!=-1}}">
+                <view class="row" style="border-bottom: 1px solid #ddd"  onTap="changeDate" data-type="handleTime">
+                    <view class="row-title">异常处理时间</view>
+                    <view class="row-extra"><input name="exceptionHandleTime" value="{{exceptionHandleTime}}" disabled="true"  /></view>
+                    <view class="a-list-arrow a-list-arrow-horizontal" />
+                </view>
+                <view class="input-title"><text style="color:red">*</text>处理效果描述</view>
+                <textarea class="multilineInput" style="border-bottom: 1px solid #ddd"  name="handlingEffect" value="{{handlingEffect}}" />
+        </block>
+        </view>
+    </view>
+</block>
+        <view a:if={{showVideo}} class="videoContainer">
+             <video class="video"  src="{{videoUrl}}" autoplay="true"   />
+             <button class="videoButton" onTap="onCloseVideo">关闭</button>
+        </view>
+    <button type="primary" formType="submit" style="position:absolute;margin:0px;width:100%">提交</button>
+</form>
+
 </view>
 

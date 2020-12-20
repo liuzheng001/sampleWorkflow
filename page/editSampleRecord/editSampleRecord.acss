@@ -248,3 +248,7 @@
     left: 40rpx;
 }
 
+.exceptionCon{
+    background-color: gray
+}
+

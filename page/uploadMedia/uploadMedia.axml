@@ -12,15 +12,18 @@
     <button class="videoButton" onTap="onCloseVideo">关闭</button>
 </view>
 <view>
+    <button onTap="qrScan">扫描二维码</button>
   <view class="page-section">
       <view class="row" style="border-bottom: 1px solid #ddd">
           <view class="row-title">
             <view class="line">项目:{{projectName}}</view>
-            <view class="line">试验记录:{{testRecordName}}</view>
+            <view class="line">试验记录:{{recordNum}}</view>
           </view>
-          <view class="row-extra" style="flex:1 1 0%">
-             <text  style ="font-size:240rpx;color:orange"   onTap="onAddMedia" class="iconfont icon-add-fill"/>
+          <view  class="row-extra" style="flex:1 1 0%">
+             <text a:if="{{recordId!==-1}}" style ="font-size:240rpx;color:orange"   onTap="onAddMedia" class="iconfont icon-add-fill"/>
+              <text a:else style ="font-size:240rpx;color:gray"    class="iconfont icon-add-fill"/>
         </view>
+
       </view>
   </view>
 
@@ -35,8 +38,9 @@
       </view>
       <view class="row-extra" style="flex:1 1 0%;text-align:left">
           <view class="line"><text>名称:{{item['name']}}</text></view>
-          <view class="line"><text>尺寸:{{item['size']}}</text></view>
-          <view><button size="mini" type="warn">删除</button></view>
+          <view class="line"><text>大小:{{item['size']}}</text></view>
+          <view class="line"><text>大小:{{item['remark']}}</text></view>
+          <!--<view><button size="mini" type="warn">删除</button></view>-->
       </view>
       </view>
   </block>

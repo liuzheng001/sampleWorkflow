@@ -62,6 +62,7 @@ function bd_encrypt(gg_lng, gg_lat) {
 // let domain = "http://47.103.63.213/eapp-corp";
 let domain = "http://r1w8478651.imwork.net:9998/eapp-corp";
 //test git,回复
+
 let url = domain + '/login.php'; */
 
 let development = true; //开发环境为true,工厂环境为false,工厂环境服务器是47.103.63.213
@@ -69,6 +70,8 @@ let domain,applicationServer;
 if (development===true){
     domain = "http://r1w8478651.imwork.net:9998/eapp-corp";
     applicationServer = "http://r1w8478651.imwork.net:9998/corp_demo_php-master/"
+    // domain = "http://192.168.0.102:9998/eapp-corp";
+    // applicationServer = "http://192.168.0.102:9998/corp_demo_php-master/"
 } else{
     domain = "http://47.103.63.213/eapp-corp";
     // domain = "https://www.ckkj.net.cn/eapp-corp";//阿里云已安装ssl证书,已知错误getFMmessage时,第一次不能得到customer清单,第二次可以,原因不明
@@ -141,7 +144,7 @@ App({
                       /* dd.switchTab({ //日历
                                 url: '/page/index'
                             })*/
-                      /*  dd.getStorage({
+                        dd.getStorage({
                             key: 'tabbarIndex',
                             success: function (res) {
                                 //不存在samleRecord key时，res.data为null
@@ -159,7 +162,7 @@ App({
                             fail: function () {
 
                             },
-                        })*/
+                        })
                     },
                     fail: (res) => {
                         console.log("httpRequestFail---", res)
@@ -168,7 +171,6 @@ App({
                     complete: (res) => {
                         // dd.hideLoading();
                     }
-
                 });
             },
           fail: (err)=>{

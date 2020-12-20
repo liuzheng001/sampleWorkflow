@@ -3,6 +3,8 @@
  */
 Page({
     data: {
+        navTab: ['生产线和设备','日期范围'],
+        currentTabIndex:1,//当前tabIndex
 
         sampleID: "",
 
@@ -34,12 +36,55 @@ Page({
         //当前列表row号
         row:0,
         customerId:"",
+        // customerId:35,
 
         //list向右滑动按钮
         swiptRightButton:[{ type: 'delete', text: '删除', fColor: 'black' }],
         swipeIndex:-1,
-        deleteAuthority:false
+        deleteAuthority:false,
+        //筛选记录
+        showModal:false,
+        ProgressLine:
+            [
+                 /*{
+                     "PLineName": "铝轮2线",
+                     "PLineId": "8BF88712-9CC8-435D-871D-A6F83551B4DA",
+                     "machines": [
+                         {
+                             "machineIdentification": "201#-全铝加工-铝轮粗加工",
+                             "machineID": "6BADCDDD-0FA0-405C-9F83-BC20C4B2FDAE"
+                         },
 
+                     ]
+                 },
+             {
+                 "PLineName": "铝轮19线",
+                 "PLineId": "946C93C7-8DD0-4160-959B-14636AF30981",
+                 "machines": [
+                 {
+                     "machineIdentification": "1901--2",
+                     "machineID": "2B9779E7-A105-4087-88B2-06C6B5A59C5F"
+                 },
+                 {
+                     "machineIdentification": "1902-铝轮加工-切削",
+                     "machineID": "DF2D72F7-9952-41BD-BA2C-FD14D8D54D1D"
+                 }
+                  ]
+             },*/
+
+            ],
+        ProgressLineIndex:-1,
+        value:[0,0],//第一个代表生产线,第二个代表设备
+       /* searchEndDate    : new Date().format("yyyy-MM-dd"),
+        searchBeginDate  :new Date(new Date()-1000 * 60 * 60 * 24 * 30).format("yyyy-MM-dd"),//前30天*/
+        searchEndDate    :"/",
+        searchBeginDate  :"/",//前30天
+        //当前数据,取消时恢复
+        beginDate:"/",
+        endDate:"/",
+        plineName:"所有",
+        machineName: "所有",
+        currentValue:[0,0]
     },
     onLoad(query) {
         const t = this;
@@ -47,13 +92,57 @@ Page({
         this.data.allProject = [];
         this.data.cursor = 1;
 
-        // this.data.sampleID = query.sampleID;
-        this.data.customerId = query.customerId;
+       this.data.customerId = query.customerId;
+
+        // this.data.customerId=35
         //临时,今后通过角色权限来做
-        if (getApp().globalData.username === "刘正" || getApp().globalData.username === "舒印" || getApp().globalData.username === "刘帅") {
+        // if (getApp().globalData.username === "刘正" || getApp().globalData.username === "舒印" || getApp().globalData.username === "刘帅") {
+        if (getApp().globalData.username === "刘正" || getApp().globalData.username === "舒印" ) {
             this.data.deleteAuthority = true;
         }
+        //得到progressLine内容
+        const url = getApp().globalData.domain + "/fmSampleRec.php";
+        dd.httpRequest({
+            url: url,
+            method: 'get',
+            data: {
+                action: 'getProgressLines',
+                customerId: query.customerId,
+                // customerId: 35,
+            },
+            dataType: 'json',
+            success: (values) => {
+                if (values.data.success === true) {
+                    //得到生产线和设备数据
+                    let ProgressLine = values.data.data.progressLines;
+                    ProgressLine.forEach( item => {
+                    //     debugger
+                        item.machines.unshift({
+                            "machineIdentification": "所有",
+                            "machineID": ""
+                        })
+                    })
+                    ProgressLine.unshift({"PLineName": "所有",
+                        "PLineId": "",
+                        "machines": [
+                        {
+                            "machineIdentification": "所有",
+                            "machineID": ""
+                        },
+                        ]}
+                    )
+
+                    t.setData({
+                        ProgressLine: values.data.data.progressLines,
+                    });
+                }
+            },
+            fail: (res) => {
+                dd.alert({'content': JSON.stringify(res)})
+            }
+        });
         getList(this.data.customerId,this.data.cursor,t);
+
 
     },
     /* onPullDownRefresh() { //下拉刷新
@@ -65,6 +154,105 @@ Page({
          dd.stopPullDownRefresh()
 
      },*/
+    //筛选modal
+    searchCondition() {
+        this.setData({
+            showModal: true,
+        })
+    },
+    resetDate() {
+        this.setData({
+            searchEndDate    :"/",
+            searchBeginDate  :"/",
+        })
+    },
+    onCancel(isShow) {
+        this.setData({
+            showModal: false,
+            value:this.data.currentValue,
+            searchEndDate    :this.data.endDate,
+            searchBeginDate  :this.data.beginDate,
+        });
+    },
+    onGetSearchList() {
+        // this.data.listData=[];
+        // getList(this.data.customerId,1,this,plineId,machineId);
+       if (this.data.searchBeginDate==='/' && this.data.searchEndDate!=='/' || this.data.searchEndDate==='/' && this.data.searchBeginDate!=='/') {
+            dd.alert({content:"日期选择有误."});
+            return ;
+        }
+        const plineNum = this.data.value[0];
+        const machineNum =this.data.value[1];
+        const plineName = this.data.ProgressLine[plineNum].PLineName;
+        const machineName = this.data.ProgressLine[plineNum].machines[machineNum].machineIdentification
+        this.setData({
+            showModal: false,
+            plineName,
+            machineName,
+            beginDate:this.data.searchBeginDate,
+            endDate:this.data.searchEndDate,
+            currentValue:this.data.value
+        });
+
+        getList(this.data.customerId,1,this);
+
+    },
+    onChangePline(e) {
+        const firstKey = e.detail.value[0];
+
+        let secondNum ;
+
+        if (this.data.value[0] === firstKey){  //picker的第一键值没变
+            secondNum = e.detail.value[1];
+        }else{
+            secondNum = 0;
+        }
+
+        this.setData({
+            value:[e.detail.value[0],secondNum],
+        })
+        console.log("value:"+this.data.value[0]+","+this.data.value[1]);
+    },
+    changeDate(e) {//异常中,改变日期
+        const t =this;
+        const type = e.currentTarget.dataset.type;
+        let currentDate,target;
+
+
+        if (type =="begin") {
+            currentDate = t.data.searchBeginDate;
+            target = "searchBeginDate";
+
+        } else {
+            currentDate = t.data.searchEndDate;
+            target = "searchEndDate";
+        }
+
+        dd.datePicker({
+            format: 'yyyy-MM-dd',
+            currentDate: currentDate,
+            success: (res) => {
+                const selectDate = new Date(res.date);
+
+                if (e.currentTarget.dataset.type === 'begin') {
+                    if(selectDate > new Date(t.data.searchEndDate)){
+                        dd.alert({content:"开始日期不能大于结束日期"})
+                        return;
+                    }
+                }else{
+                    if(selectDate < new Date(t.data.searchBeginDate)){
+                        dd.alert({content:"结束日期不能小于开始日期"})
+                        return;
+                    }
+                }
+                t.setData({
+                    [target]:selectDate.format("yyyy-MM-dd")//必须是“yyyy-mm-dd hh:mm” 和“yyyy-mm-dd”规式,要补0
+                })
+
+            }
+        });
+
+    },
     /**
      * 列表项向左滑动操作
      * @param e
@@ -78,7 +266,7 @@ Page({
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             success: (result) => {
-                if (result.confirm) {
+                if (result.confirm ) {
                     const url = getApp().globalData.domain+'/fmSampleRec.php';
                     // const url = "http://r1w8478651.imwork.net:9998/eapp-corp/fmSampleRec.php?action=deleteSampleRecord"
                     dd.httpRequest({
@@ -169,8 +357,16 @@ Page({
 /**
  * 获取项目列表
  */
-function getList(customerId,cursor, mythis){
+function getList(customerId,cursor, mythis){//plineId生产线Id,machineId机床Id
     const url = getApp().globalData.domain+'/fmSampleRec.php';
+    const plineNum = mythis.data.value[0];
+    const machineNum =mythis.data.value[1];
+    let plineId ="" ;
+    let machineId="" ;
+    if (mythis.data.ProgressLine.length > 0) {
+        plineId = mythis.data.ProgressLine[plineNum].PLineId;
+        machineId = mythis.data.ProgressLine[plineNum].machines[machineNum].machineID;
+    }
     dd.httpRequest({
         url: url,
         method: 'post',
@@ -180,6 +376,10 @@ function getList(customerId,cursor, mythis){
             customerId: customerId,
             size:10,
             cursor:cursor,
+            plineId,
+            machineId,
+            beginDate:mythis.data.searchBeginDate,
+            endDate:mythis.data.searchEndDate
         },
 
         success: function (res) {
@@ -188,26 +388,50 @@ function getList(customerId,cursor, mythis){
                 if (res.data.nextCursor == null){
                     mythis.data.cursor = null;
                   }else{
-                    //循环将结果集追加到数组后面
-                    for (let i = 0; i < res.data.data.length; i++) {
-                        mythis.data.allProject.push(res.data.data[i]);
+                    if (cursor === 1){
+                        mythis.data.allProject = res.data.data;
+                        // mythis.data.cursor = res.data.nextCursor;
+                    } else {
+                        //循环将结果集追加到数组后面
+                        for (let i = 0; i < res.data.data.length; i++) {
+                            mythis.data.allProject.push(res.data.data[i]);
+                        }
+                        // mythis.data.cursor = res.data.nextCursor;
                     }
-                    mythis.data.cursor = res.data.nextCursor;
                     mythis.setData({
-                        listData:mythis.data.allProject
+                        listData:mythis.data.allProject,
+                        cursor:res.data.nextCursor
                     })
                 }
             }else{
-                if (res.data.error.errorCode == 401) { //无记录
+                if (res.data.error.errorCode == 401 ) { //无记录
                     // dd.alert({content: '尚无跟踪记录.'})
-                    dd.showToast({
-                        type: 'fail',
-                        content: '无记录',
-                        duration: 500,
-                        success: () => {
-                            dd.navigateBack();
-                        },
-                    });
+                    if (plineId || machineId || mythis.data.searchBeginDate!=="/" || mythis.data.searchEndDate!=="/") { //加入筛选
+                        mythis.data.allProject = [];
+
+                        dd.showToast({
+                            type: 'fail',
+                            content: '该筛选条件,没有记录.',
+                            duration: 500,
+                            success: () => {
+                                mythis.setData({
+                                    cursor:null,
+                                    listData:mythis.data.allProject
+
+                                })
+                            },
+                        });
+
+                    }else { //无任何数据记录
+                        dd.showToast({
+                            type: 'fail',
+                            content: '无记录',
+                            duration: 500,
+                            success: () => {
+                                dd.navigateBack();
+                            },
+                        });
+                    }
                 }else{
                     dd.alert({content:"获取数据列表失败."});
 

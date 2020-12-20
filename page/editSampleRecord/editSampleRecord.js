@@ -13,6 +13,8 @@ Page({
         selectMachine: "",
         //选择的生产线
         selectProgressLine:"",
+        machineId:"",
+        pLineId:"",
         //试样类别
         category: '',
         //检测项目
@@ -44,9 +46,20 @@ Page({
         //显示视频预览
         showVideoPreview: false,
         videoUrl: "",
+
+        //异常数据
+        isException:false,
+        exceptionBuildTime:"",//异常建立时间
+        exceptionHandleTime:"",//异常处理时间
+        exceptionDescription:"",//异常描述
+        handlingMethod:"",
+        handlingEffect:"",
+        effectGroupIndex:-1,//0:'解决',1:'部分解决',2:'未解决'
+        focus:false,//异常描述和处理效聚焦
+        animationInfo:{}//异常动画参数
+
     },
     onLoad(query) {
-        //调试
         this.data.sampleDataRecID = query.sampleDataRecID;
         const t = this;
         //读取fm选择样品记录列表
@@ -66,9 +79,14 @@ Page({
                     //清空
                     t.data.waitDeleteVideoIds=[];
                     t.data.waitDeleteImageIds=[];
+                    //id值
+                    // t.data.machineId=res.data.data.machineId,
+                    // t.data.pLineId=res.data.data.pLineId,
                     t.setData({
                         selectProduct: res.data.data.product,
                         selectMachine: res.data.data.machine,
+                        machineId:res.data.data.machineId,
+                        pLineId:res.data.data.pLineId,
                         selectProgressLine: res.data.data.progressLine,
                         category: res.data.data.category,
                         testCategory: res.data.data.testCategory,
@@ -77,6 +95,13 @@ Page({
                         addSubjects: res.data.data.addSubjects,
                         remark: res.data.data.remark,
                         thumbs: res.data.data.thumbs,
+                        isException:res.data.data.exceptionBuildTime?true:false,
+                        exceptionBuildTime:res.data.data.exceptionBuildTime,//异常建立时间
+                        exceptionHandleTime:res.data.data.exceptionHandleTime,//异常处理时间
+                        exceptionDescription:res.data.data.exceptionDescription,//异常描述
+                        handlingMethod:res.data.data.handlingMethod,
+                        handlingEffect:res.data.data.handlingEffect,
+                        effectGroupIndex:res.data.data.effectGroupIndex//0:'解决',1:'部分解决',2:'未解决'
                     });
                 } else {
                     dd.alert({content: '得到样品记录数据失败'})
@@ -90,6 +115,9 @@ Page({
 
         })
 
+    },
+    onShow(){
+        
     },
     onUnload() {
         /*console.log("返回键按下,page销毁")
@@ -132,7 +160,10 @@ Page({
             });
         }*/
     },
-
+    //编辑生产线或设备
+    editPLineOrMachine(){
+        dd.navigateTo({url: '/page/addMachine/addMachine?PLineId='+this.data.pLineId+'&machineId='+this.data.machineId+'&type=edit'});
+    },
     //输入实测数据,写入对应subjects
     onInput: function (e) {
         const checkData = e.detail.value;
@@ -172,6 +203,86 @@ Page({
             showDetailModal:false
         })
     },*/
+    //异常相关
+    onException(){ //建立异常
+        const t = this;
+        dd.confirm({
+            title: '提示',
+            content: '建立异常.',
+            confirmButtonText: '确认',
+            success: (result) => {
+                if (result.confirm == true) {
+                    let currentTime = new Date();
+                    let animation = dd.createAnimation({
+                        duration: 1000,
+                        timeFunction: 'ease-in-out',
+                    });
+                    t.animation = animation;
+                    //向上滚动
+                    // t.animation.translateY(-200).opacity(0).step();
+                    t.animation.opacity(1).step();
+                     t.setData({
+                            isException: true,
+                            exceptionBuildTime:currentTime.format("yyyy-MM-dd"),
+                            focus: true,
+                            animationInfo: t.animation.export()
+                        })
+                    //   dd.pageScrollTo({
+                    //     scrollTop: 1000
+                    //   })
+                    //先要显示异常内容,再滚动否则无效,特别是ios
+                    setTimeout(function () {
+                       dd.pageScrollTo({
+                        scrollTop: 1000
+                    })
+                    }, 200);
+
+                }
+            }
+        })
+    },
+    radioChange(e) {
+
+        let currentTime = new Date();
+        this.setData({
+            effectGroupIndex: e.detail.value,
+            exceptionHandleTime:currentTime.format("yyyy-MM-dd")
+        })
+
+    },
+
+    onBlur() {
+        this.setData({
+            focus: false,
+        });
+    },
+    changeDate(e) {//异常中,改变日期
+        const t =this;
+        const type = e.currentTarget.dataset.type;
+        let currentDate,target;
+
+        if (type =="buildTime") {
+            currentDate = t.data.exceptionBuildTime;
+            target = "exceptionBuildTime";
+
+        } else {
+            currentDate = t.data.exceptionHandleTime;
+            target = "exceptionHandleTime";
+        }
+
+        dd.datePicker({
+            format: 'yyyy-MM-dd',
+            currentDate: currentDate,
+            success: (res) => {
+                const selectDate = new Date(res.date);
+                t.setData({
+                    [target]:selectDate.format("yyyy-MM-dd")//必须是“yyyy-mm-dd hh:mm” 和“yyyy-mm-dd”规式,要补0
+                })
+
+            }
+        });
+
+    },
     //媒体容器相关
     onMediaPreview(e) {
         const imageUrl = e.currentTarget.dataset.src;
@@ -446,12 +557,15 @@ Page({
             })
         }
     },*/
-    onSubmit() { //提交到fm
+    onSubmit(e) { //提交到fm
         const t = this;
         //数据校验,subject或addjectg不能都为0
-        if (t.data.subjects.length == 0 && t.data.addSubjects.length == 0) {
-            alert("无实测项目,不能提交");
-            return
+
+            if (t.data.subjects.length == 0 && t.data.addSubjects.length == 0 ||
+                (t.data.isException  && e.detail.value.exceptionDescription==="") ||
+                (t.data.effectGroupIndex!==-1  && e.detail.value.handlingEffect==="")) {
+                dd.alert({content: "提交数据有误,请检查!"});
+                return
         }
 
         //上传数据到fm
@@ -460,75 +574,101 @@ Page({
             content: '提交记录,确认?',
             confirmButtonText: '确认',
             success: (result) => {
-                dd.showLoading();
-                const url = getApp().globalData.domain + "/fmSampleRec.php";
-                //将应用服务器临时文件,上传阿里云
-                dd.httpRequest({
-                    url: url,
-                    method: 'post',
-                    data: {
-                        action: "editSampleRecord",
-                        sampleDataRecID: t.data.sampleDataRecID,
-                        remark: t.data.remark,
-                        subjects: JSON.stringify(t.data.subjects),
-                        addSubjects: JSON.stringify(t.data.addSubjects),
+                if (result.confirm==true) {
+                    dd.showLoading();
+                    const url = getApp().globalData.domain + "/fmSampleRec.php";
+                    //将应用服务器临时文件,上传阿里云
+                    dd.httpRequest({
+                        url: url,
+                        method: 'post',
+                        data: {
+                            action: "editSampleRecord",
+                            sampleDataRecID: t.data.sampleDataRecID,
+                            remark: t.data.remark,
+                            subjects: JSON.stringify(t.data.subjects),
+                            addSubjects: JSON.stringify(t.data.addSubjects),
+                            exceptionDescription: e.detail.value.exceptionDescription,
+                            effectGroupIndex: e.detail.value.effectGroupIndex,//后台不能变,只是index
+                            handlingEffect: e.detail.value.handlingEffect,
+                            exceptionBuildTime: e.detail.value.exceptionBuildTime,//异常建立时间
+                            exceptionHandleTime: e.detail.value.exceptionHandleTime,//异常处理时间
+                            handlingMethod: e.detail.value.handlingMethod,
+                        },
+                        success: function (res) {
+                            // dd.alert({content: JSON.stringify(res)});
+                            if (res.data.success == true) {
+                                const url = getApp().globalData.applicationServer + "uploadMediasToAiliForComponents.php"
+                                dd.httpRequest({
+                                    url: url,
+                                    method: 'POST',
+                                    data: {
+                                        thumbs: JSON.stringify(t.data.thumbs),
+                                        sampleDataRecID: t.data.sampleDataRecID,
+                                        recordSheetName: "试样记录数据",
+                                        max: 6,
+                                        waitDeleteVideoIds: t.data.waitDeleteVideoIds.join(','),
+                                        waitDeleteImageIds: t.data.waitDeleteImageIds.join(',')
+                                    },
+                                    dataType: 'json',
+                                    success: (res) => {
+                                        // jQuery('#loading').hideLoading();//loading 消失，保存完成。
+                                        dd.hideLoading();
+                                        if (res.data.success === true) {
+                                            /*alert("提交成功");*/
+                                            // t.data.backMode = 1;
 
-                    },
-                    success: function (res) {
-                       // dd.alert({content: JSON.stringify(res)});
-                        if (res.data.success == true) {
-                            const url =getApp().globalData.applicationServer+"uploadMediasToAiliForComponents.php"
-                            dd.httpRequest({
-                                url: url,
-                                method: 'POST',
-                                data: {
-                                    thumbs: JSON.stringify(t.data.thumbs),
-                                    sampleDataRecID: t.data.sampleDataRecID,
-                                    recordSheetName: "试样记录数据",
-                                    max: 6,
-                                    waitDeleteVideoIds: t.data.waitDeleteVideoIds.join(','),
-                                    waitDeleteImageIds: t.data.waitDeleteImageIds.join(',')
-                                },
-                                dataType: 'json',
-                                success: (res) => {
-                                    // jQuery('#loading').hideLoading();//loading 消失，保存完成。
-                                    dd.hideLoading();
-                                    if (res.data.success === true) {
-                                        /*alert("提交成功");*/
-                                        // t.data.backMode = 1;
+                                            dd.alert({
+                                                content: "提交成功.",
+                                                success: () => {
+                                                    //更新上一页面的数据,即sampleList的当前行,比如异常状态,不读后台
+                                                   /* const prevPage = pages[pages.length - 2];
+                                                    /!*$resultdata[] = array('sampleDataRecID'=>$res['recordID'],'testCategory' => $res['检测类别'], 'machine' => $res['查询设备::设备识别标识'], 'PLineName'=>$res['查询生产线信息::生产线名'],'product' => $res['查询配方号::配方号'], 'recorder' => $res['创建人'],'buildTime'=>$buildTime,'projectName'=>$res['样品试用记录::记录类别'].'-'.$res['样品试用记录::类别'].'-'.date('Y/m/d', strtotime($res['样品试用记录::提交试用方案时间戳'])),'isException'=>$res['异常建立时间']?$res['异常建立时间']:null,'effectResult'=>$res['异常处理结果']);*!/
+                                                    let listData = prevPage.data.listData;
+                                                    listData.forEach(item => {
+                                                        for(let key in item){
+                                                           if (key ==="sampleDataRecID") {
+                                                                listData
+                                                           }
+                                                        }
+                                                        result.push(record);
+                                                    })
 
-                                        dd.alert({
-                                            content: "提交成功.",
-                                            success: () => {
-                                                dd.navigateBack();
-                                            },
-                                        });
-                                    } else {
-                                        dd.alert({content: "上传阿里云失败"});
+                                                    prevPage.setData({             //修改上一个页面的变量
+                                                        ProgressLine,
+                                                        ProgressLineIndex,
+                                                        selectMachineIndex,
+                                                        selectMachine
+                                                    });*/
+                                                    dd.navigateBack();
+                                                },
+                                            });
+                                        } else {
+                                            dd.alert({content: "上传阿里云失败"});
 
-                                    }
-                                },
-                                fail: (res) => {
-                                    // jQuery('#loading').hideLoading();//loading 消失，保存完成。
-                                    dd.alert({content: "上传阿里云失败." + JSON.stringify(res)});
-                                    dd.hideLoading();
+                                        }
+                                    },
+                                    fail: (res) => {
+                                        // jQuery('#loading').hideLoading();//loading 消失，保存完成。
+                                        dd.alert({content: "上传阿里云失败." + JSON.stringify(res)});
+                                        dd.hideLoading();
 
-                                },
-                            })
-                        } else {
-                            dd.alert({content: "修改记录失败"});
+                                    },
+                                })
+                            } else {
+                                dd.alert({content: "修改记录失败"});
+                                dd.hideLoading();
+
+                            }
+                        },
+                        fail: (res) => {
+                            // jQuery('#loading').hideLoading();//loading 消失，保存完成。
+                            dd.alert({content: "修改记录失败." + JSON.stringify(res)});
                             dd.hideLoading();
 
-                        }
-                    },
-                    fail: (res) => {
-                        // jQuery('#loading').hideLoading();//loading 消失，保存完成。
-                        dd.alert({content: "修改记录失败." + JSON.stringify(res)});
-                        dd.hideLoading();
+                        },
 
-                    },
-
-                });
+                    });
+                }
             },
         });
     }

@@ -14,7 +14,7 @@
 
     <view class="page-section">
         <view class="row">
-          <view class="row-title">{{addPline?"生产线名":"生产线更名"}}</view>
+          <view class="row-title">生产线名</view>
           <view class="row-extra"><input name="PLineName" style="font-size:32rpx" value={{PLineName}} data-key="PLineName" onInput = "onInput" /></view>
         </view>
     </view>
@@ -35,6 +35,7 @@
   <view class="page-section">
       <view class="row">
           <view class="row-title">生产线名</view>
+          <button size="mini" onTap="editPLine" >修改</button>
           <view class="row-extra"><input name="PLineName" style="font-size:32rpx" value="{{PLineName}}"  disabled="true" /></view>
       </view>
   </view>
@@ -59,7 +60,7 @@
   <view class="page-section">
     <view class="row">
       <view class="row-title">水箱容积(升)</view>
-      <view class="row-extra"><input name="volume" style={{volume>15?"font-size:16rpx":"font-size:32rpx"}} value={{volume}}  type="number"  /></view>
+      <view class="row-extra"><input name="volume"  value={{volume}}  type="number"  /></view>
     </view>
   </view>
   <view class="page-section">
@@ -90,7 +91,7 @@
      </view>
     <view class="flex_content"> 
       <view class="input-title" style="text-align:center">备注</view>
-      <textarea class="multilineInput" name="remark" value="" />
+      <textarea class="multilineInput" name="remark" value="{{remark}}" />
     </view>
     
 	</view>
@@ -101,4 +102,9 @@
   <button class='confirm-btn' style='color:#13b5f5' formType="submit">确定</button>
   <!--</view>-->
 </form>
+</view>
+
+<view a:if={{showSrc && picture}} class="videoContainer">
+<image class="video"  src="{{picture}}"   />
+<button class="videoButton" onTap="onCloseSrc">关闭</button>
 </view>

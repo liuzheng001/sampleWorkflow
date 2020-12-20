@@ -22,6 +22,9 @@
     background: #fff;
     border-bottom: rgb(128, 124, 124) solid 1px;
 }
+.a-list .a-list-items .a-list-item .exceptionFlag {
+    padding-right: 20rpx;
+}
 
 .a-list .a-list-items .active {
     background: cornsilk;

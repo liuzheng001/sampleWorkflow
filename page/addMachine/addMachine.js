@@ -1,6 +1,8 @@
 Page({
     data: {
         showModal: false,//显示modal
+        showSrc:false,
+        type:"edit",//增加或编辑生产线或设备
         addPline: true,//true为增加生产线,false为编辑生产线
 
         customerId: "",
@@ -35,7 +37,9 @@ Page({
         ],
         PLinesIndex: -1,*/
 
-        PLineId:"",
+        PLineRecordId:"",//生产线的记录Id,由于编辑
+        PLineId:"",//生产线的主键Id,由于新建
+        machineRecordId:"",//编辑设备使用
 
         PLineName: "",
         PLineMachine: "",
@@ -52,23 +56,84 @@ Page({
 
     },
     onLoad(query) {//query包括customerId,PLines,PLinesIndex,showModal
-        // updataPLines(this,query.customerId);
-        console.log(JSON.stringify(query))
-        if (!query.showModal) { //建立新设备
-            this.setData({
-                // PLines: JSON.parse(query.PLines),
-                PLineId: query.PLineId,
-                customerId: query.customerId,
-                PLineName:query.PLineName,
+        // console.log(JSON.stringify(query))
+        if (query.type === 'edit') {//编辑
+            // dd.alert({content:query.PLineId+query.machineId})
+            const url = getApp().globalData.domain + "/fmSampleRec.php"
+            dd.httpRequest({
+                url: url,
+                method: 'POST',
+                data: {
+                    action: 'getMachineMessage',
+                    // customerId: this.data.customerId
+                    machineId: query.machineId
+                },
+                dataType: 'json',
+                traditional: true,//这里设置为true
+                success: (res) => {
+                    if (res.data.success === true) {
+                        // dd.alert({content: "建立生产线成功"});
+                        this.setData({
+                            // PLinesIndex: index,
+                            /* "pLinesName": "104车间南海本田2WH油盘生产线",
+                            "linesPosition": "车间前部靠窗",
+                            "linesDescription": "吕合金材质",
+                            "linesMachinesDescription": "钻攻中心",
+                            "serious": "一般",
+                            "pLineID": "2453B9F9-C1A1-4095-833F-7AFAD45897F4",
+                            "machineId": "71435FA6-CA2B-40D3-9D3F-880337F86802",
+                            "machineName": "钻攻中心",
+                            "machineNum": "3线op20",
+                            "machinePos": "车间前部靠窗",
+                            "machineIdentification": "3线op20-钻攻中心-车间前部靠窗",
+                            "volume": 300*/
+                            PLineName: res.data.data.pLinesName,
+                            PLineMachine: res.data.data.linesMachinesDescription,
+                            PLineProduct: res.data.data.linesDescription,
+                            PLinePosition: res.data.data.linesPosition,
+                            machineName: res.data.data.machineName,
+                            machineNum: res.data.data.machineNum,
+                            machineStation: res.data.data.machinePos,
+                            remark:res.data.data.remark ,
+                            volume: res.data.data.volume,
+                            position:res.data.data.machinePos,
+                            picture:res.data.data.machineSrc,//fm不行,估计是容器权限问题,直接做一个modal框
+                            // picture:"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1608143487067&di=5871b76d4dc83dbc8c5e4f8f0ca1a481&imgtype=0&src=http%3A%2F%2Fa2.att.hudong.com%2F27%2F81%2F01200000194677136358818023076.jpg",网络图片可以
+                            machineRecordId:res.data.data.machineId,
+                            PLineRecordId:res.data.data.PLineId,
+                            PLineId:query.PLineId
+                        });
 
+                    } else {
+                        dd.alert({content: JSON.stringify(res)});
+                    }
+                },
+                fail: (res) => {
+                    console.log("httpRequestFail---", res)
+                    dd.alert({content: JSON.stringify(res)});
+                },
+                complete: (res) => {
+                    dd.hideLoading();
+                }
             });
-        } else if (query.showModal === "true") { //建立新生产线
-            this.setData({
-                showModal: true,
-                // PLines: JSON.parse(query.PLines),
-                customerId: query.customerId,
-                // PLineId: query.PLineId,
-            })
+
+        }else {
+            if (!query.showModal) { //建立设备
+                this.setData({
+                    // PLines: JSON.parse(query.PLines),
+                    PLineId: query.PLineId,
+                    customerId: query.customerId,
+                    PLineName: query.PLineName,
+
+                });
+            } else if (query.showModal === "true") { //建立生产线
+                this.setData({
+                    showModal: true,
+                    // PLines: JSON.parse(query.PLines),
+                    customerId: query.customerId,
+                    // PLineId: query.PLineId,
+                });
+            }
         }
     },
     PLinesChange(e) {//改变当前生产线
@@ -124,6 +189,13 @@ Page({
             [e.target.dataset.key]: e.detail.value
         });
 
+    },
+    //编辑生产线
+    editPLine() {
+        this.setData({
+            showModal:true,
+            addPline:false
+        })
 
     },
     onCancelRecord() {
@@ -212,7 +284,7 @@ Page({
 
                                     }),
                                     // progressLineId: this.data.PLines[this.data.PLinesIndex]
-                                     progressLineId: t.data.PLines[t.data.PLinesIndex].recordId
+                                     progressLineId: t.data.PLineRecordId
                                 },
                                 // dataType: 'json',
                                 // traditional: true,//这里设置为true
@@ -258,12 +330,23 @@ Page({
         });
     },
     onPicturePreview(e) {
-        const imageUrl = e.currentTarget.dataset.src;
-        dd.previewImage({
-            urls: [imageUrl]
-        });
+        if (this.data.type == "edit") {
+            this.setData({
+                showSrc : true
+            })
+
+        }else {
+            const imageUrl = e.currentTarget.dataset.src;
+
+            dd.previewImage({
+                urls: [imageUrl]
+            });
+        }
     },
-    formSubmit(e) { //添加设备
+    onCloseSrc() {//编辑时,关闭图片
+        this.setData({showSrc: false})
+    },
+    formSubmit(e) { //添加或编辑设备
         let t = this;
         let form = e.detail.value;
 
@@ -273,7 +356,6 @@ Page({
             return;
         }
 
-
         dd.confirm({
             title: '提示',
             content: '提交后不能撤销.',
@@ -282,75 +364,133 @@ Page({
                 if (result.confirm === true) {
                     const app = getApp();
                     const url = getApp().globalData.domain + "/fmSampleRec.php"
-                    dd.httpRequest({
-                        url: url,
-                        method: 'POST',
-                        // headers:{'Content-Type': 'application/json'},
-                        /*       $record['生产线ID'] =$_REQUEST['PLinesId'];
-                           $record['设备名称'] =$_REQUEST['machineName'];
-                           $record['设备编号'] =$_REQUEST['machineNum'];
-                           $record['设备工位'] =$_REQUEST['machineStation'];
-                           $record['备注'] = $_REQUEST['remark']?$_REQUEST['remark']:"";
-                           $record['设备位置'] =$_REQUEST['position'];
-                           $record['水箱容积'] =$_REQUEST['volume'];
-                           $record['设备图片'] =$_REQUEST['pictureUrl']; //图片在服务器中的位置*/
-                        data: {
-                            action: 'createMachine',
-                            values: JSON.stringify({  //由于有数组,需要用这种方法向后端传,同时后端将字符串通过json_decode转为数组
-                                form_values: {
-                                    machineName: form.machineName,
-                                    machineNum: form.machineNum,
-                                    machineStation: form.machineStation,
-                                    remark: form.remark,
-                                    position: form.position,
-                                    volume: form.volume,
-                                    PLinesId: t.data.PLineId
-                                },
-                            }),
-
-
-                        },
-                        dataType: 'json',
-                        // traditional: true,//这里设置为true
-                        success: (res) => {
-                            if (res.data.success === true) {
-                                if (this.data.picture !== "") {
-                                    updatePicture(this.data.picture, '设备', '设备图片', res.data.machineRecordId)
-                                        .then(()=>{ getPLines(t.data.customerId,t.data.PLineId)})
-                                        .then(()=> {
-                                            dd.alert({
-                                                content: '提交成功',
-                                                success: () => {
-                                                    dd.navigateBack()
-                                                }
+                    if (!t.data.machineRecordId) { //建立设备
+                        dd.httpRequest({
+                            url: url,
+                            method: 'POST',
+                            // headers:{'Content-Type': 'application/json'},
+                            /*       $record['生产线ID'] =$_REQUEST['PLinesId'];
+                               $record['设备名称'] =$_REQUEST['machineName'];
+                               $record['设备编号'] =$_REQUEST['machineNum'];
+                               $record['设备工位'] =$_REQUEST['machineStation'];
+                               $record['备注'] = $_REQUEST['remark']?$_REQUEST['remark']:"";
+                               $record['设备位置'] =$_REQUEST['position'];
+                               $record['水箱容积'] =$_REQUEST['volume'];
+                               $record['设备图片'] =$_REQUEST['pictureUrl']; //图片在服务器中的位置*/
+                            data: {
+                                action: 'createMachine',
+                                values: JSON.stringify({  //由于有数组,需要用这种方法向后端传,同时后端将字符串通过json_decode转为数组
+                                    form_values: {
+                                        machineName: form.machineName,
+                                        machineNum: form.machineNum,
+                                        machineStation: form.machineStation,
+                                        remark: form.remark,
+                                        position: form.position,
+                                        volume: form.volume,
+                                        PLinesId: t.data.PLineId
+                                    },
+                                }),
+                            },
+                            dataType: 'json',
+                            // traditional: true,//这里设置为true
+                            success: (res) => {
+                                if (res.data.success === true) {
+                                    if (this.data.picture !== "") {
+                                        updatePicture(this.data.picture, '设备', '设备图片', res.data.machineRecordId)
+                                            .then(() => {
+                                                getPLines(t.data.customerId, t.data.PLineId)
                                             })
-                                        })
-                                        .catch(err=>dd.alert({title:"添加设备失败",content:JSON.stringify(err)}))
-                                } else {
-                                    dd.alert({
-                                        content: '提交成功',
-                                        success: () => {
-                                            getPLines(t.data.customerId,t.data.PLineId)
-                                                .then(()=>{ dd.navigateBack()
+                                            .then(() => {
+                                                dd.alert({
+                                                    content: '提交成功',
+                                                    success: () => {
+                                                        dd.navigateBack()
+                                                    }
                                                 })
-                                                .catch(err=>dd.alert({title:"添加设备失败",content:JSON.stringify(err)}))
-                                        }
-                                    });
+                                            })
+                                            .catch(err => dd.alert({title: "添加设备失败", content: JSON.stringify(err)}))
+                                    } else {
+                                        dd.alert({
+                                            content: '提交成功',
+                                            success: () => {
+                                                getPLines(t.data.customerId, t.data.PLineId)
+                                                    .then(() => {
+                                                        dd.navigateBack()
+                                                    })
+                                                    .catch(err => dd.alert({
+                                                        title: "添加设备失败",
+                                                        content: JSON.stringify(err)
+                                                    }))
+                                            }
+                                        });
+                                    }
+                                } else {
+                                    dd.alert({content: JSON.stringify(res)});
                                 }
-                            } else {
+                            },
+                            fail: (res) => {
+                                console.log("httpRequestFail---", res)
                                 dd.alert({content: JSON.stringify(res)});
+                            },
+                            complete: (res) => {
+                                dd.hideLoading();
                             }
-                        },
-                        fail: (res) => {
-                            console.log("httpRequestFail---", res)
-                            dd.alert({content: JSON.stringify(res)});
-                        },
-                        complete: (res) => {
-                            dd.hideLoading();
-                        }
-                    });
+                        });
+                    }else{ //编辑设备
+                        dd.httpRequest({
+                            url: url,
+                            method: 'POST',
+                            data: {
+                                action: 'editMachine',
+                                values: JSON.stringify({  //由于有数组,需要用这种方法向后端传,同时后端将字符串通过json_decode转为数组
+                                    form_values: {
+                                        machineName: form.machineName,
+                                        machineNum: form.machineNum,
+                                        machineStation: form.machineStation,
+                                        remark: form.remark,
+                                        position: form.position,
+                                        volume: form.volume,
+                                    },
+                                }),
+                                machineRecordId:t.data.machineRecordId//recordId
 
-
+                            },
+                            dataType: 'json',
+                            // traditional: true,//这里设置为true
+                            success: (res) => {
+                                if (res.data.success === true) {
+                                    if (t.data.picture  && t.data.picture.indexOf("filemaker.ckkj.net.cn")===-1 && t.data.picture.indexOf("liuzheng750417.imwork.net")===-1 ) {
+                                        updatePicture(t.data.picture, '设备', '设备图片', t.data.machineRecordId)
+                                            .then(() => {
+                                                dd.alert({
+                                                    content: '提交成功',
+                                                    success: () => {
+                                                        dd.navigateBack()
+                                                    }
+                                                })
+                                            })
+                                            .catch(err => dd.alert({title: "添加设备失败", content: JSON.stringify(err)}))
+                                    } else {
+                                        dd.alert({
+                                            content: '提交成功',
+                                            success: () => {
+                                                    dd.navigateBack()
+                                            }
+                                        });
+                                    }
+                                } else {
+                                    dd.alert({content: JSON.stringify(res)});
+                                }
+                            },
+                            fail: (res) => {
+                                console.log("httpRequestFail---", res)
+                                dd.alert({content: JSON.stringify(res)});
+                            },
+                            complete: (res) => {
+                                dd.hideLoading();
+                            }
+                        });
+                    }
                 }
             },
         });

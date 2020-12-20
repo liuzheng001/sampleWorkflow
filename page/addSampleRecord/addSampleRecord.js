@@ -86,6 +86,16 @@ Page({
             //显示视频预览
             showVideoPreview: false,
             videoUrl: "",
+    //异常数据
+        isException:false,
+        exceptionBuildTime:"",//异常建立时间
+        exceptionHandleTime:"",//异常处理时间
+        exceptionDescription:"",//异常描述
+        handlingMethod:"",
+        handlingEffect:"",
+        effectGroupIndex:-1,//0:'解决',1:'部分解决',2:'未解决'
+        focus:false,//异常描述和处理效聚焦
+        animationInfo:{}//异常动画参数
     },
     onLoad(query) {
         const t = this;
@@ -579,6 +589,86 @@ Page({
         })
 
     },
+    //异常相关
+    onException(){ //建立异常
+        const t = this;
+        dd.confirm({
+            title: '提示',
+            content: '建立异常.',
+            confirmButtonText: '确认',
+            success: (result) => {
+                if (result.confirm == true) {
+                    let currentTime = new Date();
+                    let animation = dd.createAnimation({
+                        duration: 1000,
+                        timeFunction: 'ease-in-out',
+                    });
+                    t.animation = animation;
+                    //淡入
+                    // t.animation.translateY(-200).opacity(0).step();
+                    t.animation.opacity(1).step();
+                    t.setData({
+                        isException: true,
+                        exceptionBuildTime:currentTime.format("yyyy-MM-dd"),
+                        focus: true,
+                        animationInfo: t.animation.export()
+                    })
+                    //   dd.pageScrollTo({
+                    //     scrollTop: 1000
+                    //   })
+                    //先要显示异常内容,再滚动否则无效,特别是ios
+                    setTimeout(function () {
+                        dd.pageScrollTo({
+                            scrollTop: 1000
+                        })
+                    }, 200);
+
+                }
+            }
+        })
+    },
+    radioChange(e) {
+
+        let currentTime = new Date();
+        this.setData({
+            effectGroupIndex: e.detail.value,
+            exceptionHandleTime:currentTime.format("yyyy-MM-dd")
+        })
+
+    },
+
+    onBlur() {
+        this.setData({
+            focus: false,
+        });
+    },
+    changeDate(e) {//异常中,改变日期
+        const t =this;
+        const type = e.currentTarget.dataset.type;
+        let currentDate,target;
+
+        if (type =="buildTime") {
+            currentDate = t.data.exceptionBuildTime;
+            target = "exceptionBuildTime";
+
+        } else {
+            currentDate = t.data.exceptionHandleTime;
+            target = "exceptionHandleTime";
+        }
+
+        dd.datePicker({
+            format: 'yyyy-MM-dd',
+            currentDate: currentDate,
+            success: (res) => {
+                const selectDate = new Date(res.date);
+                t.setData({
+                    [target]:selectDate.format("yyyy-MM-dd")//必须是“yyyy-mm-dd hh:mm” 和“yyyy-mm-dd”规式,要补0
+                })
+
+            }
+        });
+
+    },
     onUploadMedia() {
         if (this.data.thumbs.length >= 1) {
             const t = this;
@@ -637,10 +727,15 @@ Page({
             })
         }
     },
-    onSubmit() { //提交到fm
+    onSubmit(e) { //提交到fm
         const t = this;
-        //数据校验
-        if (t.data.ProgressLineIndex == -1 || t.data.selectMachineIndex == -1 || (t.data.subjects.length == 0 && t.data.addSubjects.length == 0)) {
+        //数据校验,
+        // 有异常则,异常描述不能为空
+        //有处理结果序号,处理效果不能为空
+        if (t.data.ProgressLineIndex === -1 || t.data.selectMachineIndex === -1 || (t.data.subjects.length === 0 &&
+            t.data.addSubjects.length === 0) ||
+            (t.data.isException  && e.detail.value.exceptionDescription==="") ||
+            (t.data.effectGroupIndex!==-1  && e.detail.value.handlingEffect==="")) {
             dd.alert({content: "提交数据有误,请检查!"});
             return;
         }
@@ -671,6 +766,13 @@ Page({
                             subjects: JSON.stringify(t.data.subjects),
                             addSubjects: JSON.stringify(t.data.addSubjects),
                             submitName: getApp().globalData.username,
+                            // isException:t.data.isException,
+                            exceptionDescription: e.detail.value.exceptionDescription,
+                            effectGroupIndex: t.data.effectGroupIndex,//后台不能变,只是index
+                            handlingEffect: e.detail.value.handlingEffect,
+                            exceptionBuildTime:e.detail.value.exceptionBuildTime,//异常建立时间
+                            exceptionHandleTime:e.detail.value.exceptionHandleTime,//异常处理时间
+                            handlingMethod:e.detail.value.handlingMethod,
                         },
                         success: function (res) {
                             if (res.data.success == true) {

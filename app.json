@@ -1,15 +1,15 @@
 {
   "pages": [
-    "page/uploadMedia/uploadMedia",
     "page/index/index",
+    "page/addSampleRecord/addSampleRecord",
+    "page/uploadMedia/uploadMedia",
     "page/addMachine/addMachine",
     "page/trialRecord/trialRecordList/trialRecordList",
     "page/trialRecord/trialRecord",
     "page/index/index",
     "page/selectCustomer/selectCustomer",
-    "page/addSampleRecord/addSampleRecord",
-    "page/editSampleRecord/editSampleRecord",
-    "page/editSampleRecord/sampleList/sampleList"
+    "page/editSampleRecord/sampleList/sampleList",
+    "page/editSampleRecord/editSampleRecord"
   ],
   "window": {
     "defaultTitle": "长凯CRM",

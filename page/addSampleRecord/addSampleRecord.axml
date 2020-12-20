@@ -4,7 +4,7 @@
         <!-- <view class="videoClose">
             <text  style = "font-size:1rem;background-color:beige" onTap="onCloseVideo"   class="iconfont icon-delete"/>
         </view> -->
-    </view>
+</view>
 <view  a:else >
     <commonmodal show="{{showModal}}"  onCancelRecord="onCancelRecord" onCreateRecord ="onCreateRecord" >
        <!--<view class='modal-content'>-->
@@ -98,7 +98,7 @@
     </commonmodal> -->
 
     <!--<input name="selectProgressLine"  value="{{ProgressLine[ProgressLine.length-1]}}" disabled="true"  />-->
-    
+    <form onSubmit="onSubmit">
     <view class="page-section">
         <picker onChange="selectPLine" value="{{ProgressLineIndex}}" range="{{ProgressLine}}" range-key="PLineName">
             <view class="row">
@@ -160,30 +160,53 @@
         <textarea class="multilineInput" data-name="remark" value={{remark}} onInput="onTextareaInput" />
     </view>
 
-    <!--<view><button type="primary" onTap="onException">记录异常</button></view>
-
-    <view class="page-section">
-        <view class="input-title">异常描述</view>
-        <textarea class="multilineInput" name="exception" value="" />
+    <view a:if="{{!isException}}"><button type="warn" onTap="onException">记录异常</button></view>
+    <block a:if="{{isException}}">
+        <view class="exceptionCon" animation="{{animationInfo}}" style="{{animationInfo?0:1}}">
+        <view class="page-module-title" style="background-color:orange">异常记录</view>
+        <view class="page-section">
+        <view class="row" onTap="changeDate" data-type="buildTime">
+            <view class="row-title">建立异常时间</view>
+            <view class="row-extra"><input name="exceptionBuildTime" value="{{exceptionBuildTime}}" disabled="true"  /></view>
+            <view class="a-list-arrow a-list-arrow-horizontal" />
+        </view>
     </view>
+    <view class="page-section">
+        <view class="input-title"><text style="color:red">*</text>异常描述</view>
+        <textarea class="multilineInput" name="exceptionDescription" value="{{exceptionDescription}}" />
+    </view>
+
     <view class="page-section">
         <view class="input-title">异常处置办法</view>
-        <textarea class="multilineInput" name="handlingMethod" value="" />
+        <textarea class="multilineInput" name="handlingMethod" value="{{handlingMethod}}" />
     </view>
 
     <view class="page-section">
-        <view class="input-title">处理效果</view>
-        <radio-group name="effect-group" style="display:flex;margin-top:40rpx">
-            <label  style="flex:1;margin-left:0.1rem;font-size:0.34rem"><radio value="1"/>解决</label>
-            <label  style="flex:1;font-size:0.34rem"><radio value="2"/>部分解决</label>
-            <label  style="flex:1.5;font-size:0.34rem"><radio value="3"/>需要技术支持</label>
+        <view class="input-title">处理结果</view>
+        <radio-group name="effectGroup" style="display:flex;margin-top:40rpx" onChange="radioChange">
+            <label  style="flex:1;margin-left:0.1rem;font-size:0.34rem"><radio value="0"/>解决</label>
+            <label  style="flex:1;font-size:0.34rem"><radio value="1"/>部分解决</label>
+            <label  style="flex:1.5;font-size:0.34rem"><radio value="2"/>未解决</label>
         </radio-group>
     </view>
-    <view class="page-section">
-        <view class="input-title">处理效果描述</view>
-        <textarea class="multilineInput" name="handlingEffect" value="" />
-    </view>-->
-    <button type="primary" onTap="onSubmit" style="position:absolute;margin:0px;width:100%">提交</button>
+    <block a:if="{{effectGroupIndex!=-1}}">
+        <view class="page-section">
+            <view class="row" onTap="changeDate" data-type="handleTime">
+                <view class="row-title">异常处理时间</view>
+                <view class="row-extra"><input name="exceptionHandleTime" value="{{exceptionHandleTime}}" disabled="true"  /></view>
+                <view class="a-list-arrow a-list-arrow-horizontal" />
+            </view>
+        </view>
+        <view class="page-section">
+            <view class="input-title"><text style="color:red">*</text>处理效果描述</view>
+            <textarea class="multilineInput" name="handlingEffect" value="{{handlingEffect}}" />
+        </view>
+    </block>
+    </block>
+    <button type="primary" formType="submit" style="position:absolute;margin:0px;width:100%">提交</button>
     </view>
+    </form>
+
+
 </view>
 
