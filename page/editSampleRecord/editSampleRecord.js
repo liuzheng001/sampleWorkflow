@@ -621,26 +621,32 @@ Page({
                                                 content: "提交成功.",
                                                 success: () => {
                                                     //更新上一页面的数据,即sampleList的当前行,比如异常状态,不读后台
-                                                   /* const prevPage = pages[pages.length - 2];
-                                                    /!*$resultdata[] = array('sampleDataRecID'=>$res['recordID'],'testCategory' => $res['检测类别'], 'machine' => $res['查询设备::设备识别标识'], 'PLineName'=>$res['查询生产线信息::生产线名'],'product' => $res['查询配方号::配方号'], 'recorder' => $res['创建人'],'buildTime'=>$buildTime,'projectName'=>$res['样品试用记录::记录类别'].'-'.$res['样品试用记录::类别'].'-'.date('Y/m/d', strtotime($res['样品试用记录::提交试用方案时间戳'])),'isException'=>$res['异常建立时间']?$res['异常建立时间']:null,'effectResult'=>$res['异常处理结果']);*!/
-                                                    let listData = prevPage.data.listData;
-                                                    listData.forEach(item => {
-                                                        for(let key in item){
-                                                           if (key ==="sampleDataRecID") {
-                                                                listData
-                                                           }
-                                                        }
-                                                        result.push(record);
-                                                    })
+                                                    const pages = getCurrentPages();
+                                                    const prevPage = pages[pages.length - 2];
+                                                    /*$resultdata[] = array('sampleDataRecID'=>$res['recordID'],'testCategory' => $res['检测类别'], 'machine' => $res['查询设备::设备识别标识'], 'PLineName'=>$res['查询生产线信息::生产线名'],'product' => $res['查询配方号::配方号'], 'recorder' => $res['创建人'],'buildTime'=>$buildTime,'projectName'=>$res['样品试用记录::记录类别'].'-'.$res['样品试用记录::类别'].'-'.date('Y/m/d', strtotime($res['样品试用记录::提交试用方案时间戳'])),'isException'=>$res['异常建立时间']?$res['异常建立时间']:null,'effectResult'=>$res['异常处理结果']);*/
+                let listData = prevPage.data.listData;
+                listData.forEach( (item,index,originalData) => {
+                    if(item.sampleDataRecID == t.data.sampleDataRecID ){//字符串和数字未转换，判断
+                        item.isException = t.data.isException;
+                        if(t.data.effectGroupIndex === -1){
+                            item.effectResult = ""
+                        }else if(t.data.effectGroupIndex == 0) {//字符串和数字未转换，判断
+                            item.effectResult = "解决"
+                        }else if(t.data.effectGroupIndex == 1) {
+                            item.effectResult = "部分解决"
+                        }else if(t.data.effectGroupIndex == 2) {
+                            item.effectResult = "未解决"
 
-                                                    prevPage.setData({             //修改上一个页面的变量
-                                                        ProgressLine,
-                                                        ProgressLineIndex,
-                                                        selectMachineIndex,
-                                                        selectMachine
-                                                    });*/
-                                                    dd.navigateBack();
-                                                },
+                        }
+                       originalData.splice(index,1,item);//把index的内容替换为item，listdata数组内容变化
+                    }
+                })
+
+                        prevPage.setData({             //修改上一个页面的变量
+                            listData
+                        });
+                        dd.navigateBack();
+                    },
                                             });
                                         } else {
                                             dd.alert({content: "上传阿里云失败"});
