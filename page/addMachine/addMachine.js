@@ -2,8 +2,8 @@ Page({
     data: {
         showModal: false,//显示modal
         showSrc:false,
-        type:"edit",//增加或编辑生产线或设备
-        addPline: true,//true为增加生产线,false为编辑生产线
+        type:"",//增加或编辑生产线或设备
+        // addPline: true,//true为增加生产线,false为编辑生产线
 
         customerId: "",
 
@@ -87,6 +87,7 @@ Page({
                             "machinePos": "车间前部靠窗",
                             "machineIdentification": "3线op20-钻攻中心-车间前部靠窗",
                             "volume": 300*/
+                            customerId:res.data.data.customerId,
                             PLineName: res.data.data.pLinesName,
                             PLineMachine: res.data.data.linesMachinesDescription,
                             PLineProduct: res.data.data.linesDescription,
@@ -101,7 +102,10 @@ Page({
                             // picture:"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1608143487067&di=5871b76d4dc83dbc8c5e4f8f0ca1a481&imgtype=0&src=http%3A%2F%2Fa2.att.hudong.com%2F27%2F81%2F01200000194677136358818023076.jpg",网络图片可以
                             machineRecordId:res.data.data.machineId,
                             PLineRecordId:res.data.data.PLineId,
-                            PLineId:query.PLineId
+                            PLineId:query.PLineId,
+                            type:"edit",
+                            showModal:query.showModal=="true"?true:false,
+
                         });
 
                     } else {
@@ -191,13 +195,13 @@ Page({
 
     },
     //编辑生产线
-    editPLine() {
+   /* editPLine() {
         this.setData({
             showModal:true,
-            addPline:false
+            // addPline:false
         })
 
-    },
+    },*/
     onCancelRecord() {
         /*this.setData({
             showModal:false,
@@ -219,11 +223,11 @@ Page({
         }
         dd.confirm({
             title: '提示',
-            content: t.data.addPline === true?'建立新生产线.':'编辑生产线',
+            content: t.data.type !== 'edit'?'建立新生产线.':'编辑生产线',
             confirmButtonText: '提交',
             success: (result) => {
                     const url = getApp().globalData.domain + "/fmSampleRec.php"
-                    if (this.data.addPline === true) { //代表新增
+                    if (t.data.type !=="edit") { //代表新增
                         dd.httpRequest({
                             url: url,
                             method: 'post',
@@ -268,7 +272,7 @@ Page({
                                 dd.hideLoading();
                             }
                         });
-                    }else{//编辑生产线,暂无调用入口
+                    }else{//编辑生产线,
                             dd.httpRequest({
                                 url: url,
                                 method: 'POST',
@@ -294,7 +298,17 @@ Page({
                                             content: "编辑生产线成功",
                                             success:(result)=>{
                                                 // updataPLines(t,t.data.customerId)
-                                                dd.navigateBack();
+                                           /*     dd.navigateBack();
+                                                dd.redirectTo({url: '/page/editSampleRecord/sampleList/sampleList?customerId='+t.data.customerId});*/
+                                                const pages = getCurrentPages();
+                                                const prevPage = pages[pages.length - 3];     //获取上一个页面, 既添加样品数据detailed
+                                                /*prevPage.setData({
+                                                    refresh:true
+                                                })     */
+                                                prevPage.data.refresh = true;
+                                                dd.navigateBack({
+                                                    delta: 2
+                                                })
 
                                             }
                                         });
@@ -465,7 +479,17 @@ Page({
                                                 dd.alert({
                                                     content: '提交成功',
                                                     success: () => {
-                                                        dd.navigateBack()
+                                                        //刷新页面
+                                                        const pages = getCurrentPages();
+                                                        const prevPage = pages[pages.length - 3];     //获取上一个页面, 既添加样品数据detailed
+                                                        /*prevPage.setData({
+                                                            refresh:true
+                                                        })     */
+                                                        prevPage.data.refresh = true;
+                                                        dd.navigateBack({
+                                                            delta: 2
+                                                        })
+                                                     /*   dd.redirectTo({url: '/page/editSampleRecord/sampleList/sampleList?customerId='+t.data.customerId});*/
                                                     }
                                                 })
                                             })
@@ -474,7 +498,17 @@ Page({
                                         dd.alert({
                                             content: '提交成功',
                                             success: () => {
-                                                    dd.navigateBack()
+                                                const pages = getCurrentPages();
+                                                const prevPage = pages[pages.length - 3];     //获取上一个页面, 既添加样品数据detailed
+                                                /*prevPage.setData({
+                                                    refresh:true
+                                                })     */
+                                                prevPage.data.refresh = true;
+                                                dd.navigateBack({
+                                                    delta: 2
+                                                })
+                                              /*  dd.redirectTo({url: '/page/editSampleRecord/sampleList/sampleList?customerId='+t.data.customerId});*/
+
                                             }
                                         });
                                     }

@@ -5,6 +5,7 @@ Page({
     data: {
         navTab: ['生产线和设备','日期范围'],
         currentTabIndex:1,//当前tabIndex
+        refresh:false,
 
         sampleID: "",
 
@@ -143,6 +144,69 @@ Page({
         });
         getList(this.data.customerId,this.data.cursor,t);
 
+
+    },
+    onShow() {
+        //还原,否则会被记忆,但this.setData的渲染数据不会被记忆
+        //refresh为true,如果是从editMachine返回并且对machine或Pline进行了编辑,则重载
+        if (this.data.refresh ) {
+
+            const t = this;
+            this.data.allProject = [];
+            this.data.cursor = 1;
+            // this.data.customerId = query.customerId;
+
+            // this.data.customerId=35
+            //临时,今后通过角色权限来做
+            // if (getApp().globalData.username === "刘正" || getApp().globalData.username === "舒印" || getApp().globalData.username === "刘帅") {
+            if (getApp().globalData.username === "刘正" || getApp().globalData.username === "舒印") {
+                this.data.deleteAuthority = true;
+            }
+            //得到progressLine内容
+            const url = getApp().globalData.domain + "/fmSampleRec.php";
+            dd.httpRequest({
+                url: url,
+                method: 'get',
+                data: {
+                    action: 'getProgressLines',
+                    // customerId: query.customerId,
+                    // customerId: 35,
+                },
+                dataType: 'json',
+                success: (values) => {
+                    if (values.data.success === true) {
+                        //得到生产线和设备数据
+                        let ProgressLine = values.data.data.progressLines;
+                        ProgressLine.forEach(item => {
+                            //     debugger
+                            item.machines.unshift({
+                                "machineIdentification": "所有",
+                                "machineID": ""
+                            })
+                        })
+                        ProgressLine.unshift({
+                                "PLineName": "所有",
+                                "PLineId": "",
+                                "machines": [
+                                    {
+                                        "machineIdentification": "所有",
+                                        "machineID": ""
+                                    },
+                                ]
+                            }
+                        )
+
+                        t.setData({
+                            ProgressLine: values.data.data.progressLines,
+                        });
+                    }
+                },
+                fail: (res) => {
+                    dd.alert({'content': JSON.stringify(res)})
+                }
+            });
+            getList(this.data.customerId, this.data.cursor, t);
+        }
 
     },
     /* onPullDownRefresh() { //下拉刷新
@@ -345,11 +409,12 @@ Page({
     //进入sample数据详情
     onSampleRecDetail(e){
       this.setData({
-         row:e.currentTarget.dataset.row
+         row:e.currentTarget.dataset.row,
+          refresh:false
        })
        const sampleDataRecID =e.currentTarget.dataset.id;
         dd.navigateTo({
-            url: "/page/editSampleRecord/editSampleRecord?sampleDataRecID="+sampleDataRecID
+            url: "/page/editSampleRecord/editSampleRecord?sampleDataRecID="+sampleDataRecID+"&customerId="+this.data.customerId
         })
     }
 });

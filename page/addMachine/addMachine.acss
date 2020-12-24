@@ -28,3 +28,8 @@
     top: 40rpx;
     left: 40rpx;
 }
+
+/* 将组件mask中的内容,覆盖全页 */
+.mask .modal-content{ 
+    margin-top:0;
+}

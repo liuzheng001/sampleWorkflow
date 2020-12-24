@@ -9,8 +9,14 @@
     </view>
     <view class="page-section">
       <view class="row">
-        <view class="row-title" data-plineid="{{pLineId}}" data-machineid="{{machineId}}" onTap="editPLineOrMachine">生产线/设备名称</view>
-        <view class="row-extra"><view><input  style={{selectProgressLine.length>15?"font-size:24rpx":"font-size:32rpx"}} value={{selectProgressLine}} disabled="true"  /></view><view><input  style={{selectMachine.length>15?"font-size:24rpx":"font-size:32rpx"}} value={{selectMachine}} disabled="true"  /></view></view>
+        <view class="row-title" data-plineid="{{pLineId}}" data-machineid="{{machineId}}" >
+        <button  onTap="editPLineOrMachine">
+        生产线/设备名称 >
+        </button></view>
+        <view class="row-extra">
+            <view><input  style={{selectProgressLine.length>15?"font-size:24rpx":"font-size:32rpx"}} value={{selectProgressLine}} disabled="true"  />
+            </view><view><input  style={{selectMachine.length>15?"font-size:24rpx":"font-size:32rpx"}} value={{selectMachine}} disabled="true"  /></view>
+        </view>
       </view>
     </view>
   <!--  <view class="page-section">

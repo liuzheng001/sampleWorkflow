@@ -162,7 +162,22 @@ Page({
     },
     //编辑生产线或设备
     editPLineOrMachine(){
-        dd.navigateTo({url: '/page/addMachine/addMachine?PLineId='+this.data.pLineId+'&machineId='+this.data.machineId+'&type=edit'});
+        const options = ['编辑生产线信息','编辑设备信息']
+        dd.showActionSheet({
+            title: "选择?",
+            items: options,
+            //cancelButtonText: '取消好了', //android无效
+            success: (res) => {
+                const index = res.index;
+                switch (index) {
+                    case 0://编辑生产线信息
+                        dd.navigateTo({url: '/page/addMachine/addMachine?PLineId=' + this.data.pLineId + '&machineId=' + this.data.machineId + '&type=edit&showModal=true'});
+                        break;
+                    case 1://编辑设备
+                        dd.navigateTo({url: '/page/addMachine/addMachine?PLineId=' + this.data.pLineId + '&machineId=' + this.data.machineId + '&type=edit&showModal=false'});
+                }
+            }
+        })
     },
     //输入实测数据,写入对应subjects
     onInput: function (e) {
@@ -641,7 +656,6 @@ Page({
                        originalData.splice(index,1,item);//把index的内容替换为item，listdata数组内容变化
                     }
                 })
-
                         prevPage.setData({             //修改上一个页面的变量
                             listData
                         });
